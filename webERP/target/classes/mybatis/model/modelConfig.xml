@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+ <settings>
+        <setting name="cacheEnabled" value="false" />
+        <setting name="jdbcTypeForNull" value="NULL" />
+    </settings>
+	<typeAliases>
+		<!-- 생산파트 -->
+		<typeAlias type="com.myspring.commonProduction.commitOperationInstruction.vo.CommitOperationInstructionVO" alias="CommitOperationInstructionVO" />
+		<typeAlias type="com.myspring.commonProduction.operationRegist.vo.OperationRegistVO" alias="OperationRegistVO" />
+		<typeAlias type="com.myspring.commonProduction.operationRegist.vo.FactoryViewVO" alias="FactoryViewVO" />
+		<typeAlias type="com.myspring.commonProduction.operationRegist.vo.DepartmentViewVO" alias="DepartmentViewVO" />
+		<typeAlias type="com.myspring.commonProduction.operationRegist.vo.ProductionPalnViewVO" alias="ProductionPalnViewVO" />
+		<typeAlias type="com.myspring.commonProduction.commitOperationInstruction.vo.ItemCodePopVO" alias="ItemCodePopVO" />
+		<typeAlias type="com.myspring.commonProduction.operationRegist.vo.OperationDetailVO" alias="OperationDetailVO" />
+		<typeAlias type="com.myspring.commonProduction.operationInsClosing.vo.OperationInsClosingVO" alias="OperationInsClosingVO" />
+		<typeAlias type="com.myspring.commonProduction.operationInsClosing.vo.OperationInsClosingDetailVO" alias="OperationInsClosingDetailVO" />
+		<typeAlias type="com.myspring.commonProduction.operationInsClosing.vo.itemVO" alias="itemVO" />
+		<typeAlias type="com.myspring.commonProduction.registOperationPerformance.vo.RegistOperationPerformanceVO" alias="RegistOperationPerformanceVO" />
+		<typeAlias type="com.myspring.commonProduction.registOperationPerformance.vo.RegistOperationPerformanceDetailVO" alias="RegistOperationPerformanceDetailVO" />
+		<typeAlias type="com.myspring.commonProduction.registOperationPerformance.vo.HouseCodeSearchVO" alias="HouseCodeSearchVO" />
+		<typeAlias type="com.myspring.commonProduction.registOperationPerformance.vo.ProcessCodeSearchVO" alias="ProcessCodeSearchVO" />
+		<typeAlias type="com.myspring.commonProduction.registOperationPerformance.vo.WorkplaceCodeSearchVO" alias="WorkplaceCodeSearchVO" />
+		<typeAlias type="com.myspring.commonProduction.operationRegist.vo.FacilitySearchVO" alias="FacilitySearchVO" />
+		<typeAlias type="com.myspring.commonProduction.registOperationPerformance.vo.PerformanceQuantityVO" alias="PerformanceQuantityVO" />
+		<typeAlias type="com.myspring.commonProduction.workInProcess.vo.WorkInProcessVO" alias="WorkInProcessVO" />
+		<!-- 물류 구매관리 파트 -->
+		<!-- 구매관리 파트 -->
+		<typeAlias type="com.myspring.MainPlan.vo.MainPlanVO" alias="MainPlanVO" />
+		<typeAlias type="com.myspring.MainPlan.MpsOS.vo.MpsOSVO" alias="MpsOSVO" />
+		<typeAlias type="com.myspring.Billing.vo.BIllIngVO" alias="BIllIngVO" />
+		<typeAlias type="com.myspring.Requiredamount.vo.RequiredamountVO" alias="RequiredamountVO" />
+		<typeAlias type="com.myspring.order_closing.vo.OrderClosingVO" alias="OrderClosingVO" />
+		<typeAlias type="com.myspring.invenBasicInfo.regItemUnitPrice.vo.iupVO" alias="iupVO" />
+		<!-- BOM 모델 -->
+		<typeAlias type="com.myspring.productionBaseInfo.BOM.vo.bomVO" alias="bomVO" />
+		<typeAlias type="com.myspring.productionBaseInfo.BOM.vo.RegOutSourcingPriceVO" alias="outpriVO" />
+		<typeAlias type="com.myspring.productionBaseInfo.regDefectiveType.vo.DefectiveTypeVO" alias="defVO" />
+		<typeAlias type="com.myspring.Login.vo.LoginVO" alias="loginVO" />		
+		<!-- salesplan -->
+			<typeAlias type="com.myspring.salesmanage.itemview.vo.ItemViewVO" alias="itemviewVO" />
+			<typeAlias type="com.myspring.salesmanage.cor.vo.CorVO"  alias="corVO" />
+			<typeAlias type="com.myspring.salesmanage.order.vo.OrderVO"  alias="orderVO" />
+			<typeAlias type="com.myspring.businessStatus.releaseStatus.vo.rsVO" alias="rsVO" />
+			<typeAlias type="com.myspring.businessStatus.releaseStatus.vo.rsjVO" alias="rsjVO" />
+			<typeAlias type="com.myspring.salesmanage.salesplan.vo.spVO" alias="spVO" />
+			<typeAlias type="com.myspring.salesmanage.forward.vo.ForwardVO" alias="forwardVO" />
+		<!-- 외주 파트 -->
+		<typeAlias type="com.myspring.outsourcing_manage.RegOutsourcing.vo.RegOutsourcingVO" alias="RegOutsourcingVO" />
+		<typeAlias type="com.myspring.outsourcing_manage.ComOutsourcing.vo.ComOutsourcingVO" alias="comOutsourcingVO" /> 
+		<typeAlias type="com.myspring.outsourcing_manage.OutRelease.vo.OutReleaseVO" alias="OutReleaseVO" /> 
+		<typeAlias type="com.myspring.outsourcing_manage.RegOutPerformance.vo.RegOutPerformanceVO" alias="RegOutPerformanceVO" /> 
+		<!-- 재고 관리 -->
+		<typeAlias type="com.myspring.StockManage.vo.StockManageVO" alias="StockManageVO"/>
+		<!-- <typeAlias type="com.myspring.outsourcing_manage.RegOutsourcing.vo.RegOutsourcingVO" alias="RegOutsourcingVO" /> -->
+		<!-- 회사등록 -->
+		<typeAlias type="com.myspring.systemmag.vo.SystemmagVO" alias="SystemmagVO"	/>
+		<!-- 사업장등록 -->
+		<typeAlias type="com.myspring.systemmag.vo.WorkplaceVO" alias="WorkplaceVO" />
+		<!-- 품목등록 -->
+		<typeAlias type="com.myspring.systemmag.vo.itemVO" alias="itemRegVO" />
+		<!-- 품목군등록 -->
+		<typeAlias type="com.myspring.systemmag.vo.ItemgVO" alias="ItemgVO" />
+		<!-- 사원조회 -->
+		<typeAlias type="com.myspring.systemmag.vo.EmployeeVO" alias="EmployeeVO" />
+		<!-- 부서등록 -->
+		<typeAlias type="com.myspring.systemmag.vo.DepartmentVO" alias="DepartmentVO" />
+		<!-- 우편번호(팝업) -->
+		<typeAlias type="com.myspring.systemmag.vo.ZipcodeVO" alias="ZipcodeVO" />
+		<!-- 부문(팝업) -->
+		<typeAlias type="com.myspring.systemmag.vo.SectorVO" alias="SectorVO" />
+		<!-- 성명제 -->
+		<typeAlias type="com.myspring.systemmag.vo.SystemmagVOMJ" alias="SystemmagVOMJ"	/>
+	</typeAliases>
+</configuration>	 

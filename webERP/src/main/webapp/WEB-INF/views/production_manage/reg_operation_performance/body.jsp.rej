@@ -1,0 +1,9 @@
+diff a/screen/webERP/src/main/webapp/WEB-INF/views/production_manage/reg_operation_performance/body.jsp b/screen/webERP/src/main/webapp/WEB-INF/views/production_manage/reg_operation_performance/body.jsp	(rejected hunks)
+@@ -323,6 +323,7 @@
+   		    linkPath.setAttribute("value", link);
+   		  var performanceQuantity = document.getElementById("performanceQuantity").value;
+           });
++>>>>>>> 6cef74d5221ebc0090a6db8aeef5307b9cb688c0
+    		   if (isEmpty(performanceDate)){
+ 		      		alert("��¥���� ������ֽ��ϴ�. ���� �߰����ּ���!");
+ 		      		document.getElementById("performanceDate").focus();

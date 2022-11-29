@@ -1,0 +1,2428 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mappers.erp">
+	<resultMap id="SmBimResult"	type="CommitOperationInstructionVO">
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+		<result property="dailyProduction" column="DailyProduction" />
+		<result property="sequence" column="Sequence" />
+		<result property="scheduled" column="ScheduledDateOfOperation" />
+		<result property="quantity" column="quantity" />
+		<result property="note" column="note" />
+		<result property="startDate" column="start_Date" />
+		<result property="endDate" column="end_Date" />
+		<result property="productionPlanCode" column="productionPlanCode" />
+	</resultMap>
+	<resultMap id="OpePerRegResult" type="OperationRegistVO">
+		<result property="workOrderNumber" column="workOrderNumber" />
+		<result property="materialstatus" column="MATERIALFORWARDINGSTATUS" />
+		<result property="instructionDate" column="InstructionDate" />
+		<result property="dueDate" column="dueDate" />
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+		<result property="indicated" column="IndicatedQuantity" />
+		<result property="sumPerformanceQuantity" column="performanceQuantity" />
+		<result property="remainingPerformance" column="remainingPerformance" />
+		<result property="status" column="status" />
+		<result property="inspection" column="Inspection" />
+		<result property="processCode" column="func_pro_reg(PROCESS_CODE)" />
+		<result property="workplaceCode" column="WORKPLACE_CODE" />
+		<result property="productionFacility" column="PRODUCTIONFACILITY" />
+		<result property="taskTeam" column="taskTeam" />
+		<result property="note" column="note" />
+		<result property="loss" column="loss" />
+		<result property="productionPlanCode" column="ProductionPlanCode" />
+	</resultMap>
+	<resultMap id="OpePerRegDetResult" type="OperationDetailVO">
+		<result property="forwardingNumber" column="FORWARDINGNUMBER" />
+		<result property="billingDate" column="BILLINGDATE" />
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="standard" column="STANDARD" />
+		<result property="inventoryUnit" column="INVENTORY_UNIT" />
+		<result property="precisionQuantity" column="PRECISIONQUANTITY" />
+		<result property="loss" column="loss" />
+		<result property="comfirmQuantity" column="FORWARDINGQUANTITY" />
+		<result property="note" column="note" />
+		<result property="workOrderNumber" column="workOrderNumber" />
+	</resultMap>
+	<resultMap id="RegOpePerResult" type="RegistOperationPerformanceVO">
+		<result property="workOrderNumber" column="workOrderNumber" />
+		<result property="materialstatus" column="MATERIALFORWARDINGSTATUS" />
+		<result property="workplaceCode" column="WORKPLACE_CODE" />
+		<result property="instructionDate" column="InstructionDate" />
+		<result property="dueDate" column="dueDate" />
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+		<result property="indicated" column="IndicatedQuantity" />
+		<result property="sumPerformanceQuantity" column="performanceQuantity" />
+		<result property="remainingPerformance" column="remainingPerformance" />
+		<result property="status" column="status" />
+		<result property="workSortation" column="workSortation" />
+		<result property="inspection" column="Inspection" />
+		<result property="productionFacility" column="PRODUCTIONFACILITY" />
+		<result property="taskTeam" column="taskTeam" />
+		<result property="note" column="note" />
+		<result property="productionPlanCode" column="ProductionPlanCode" />
+	</resultMap>
+	<resultMap id="OpeCloDetResult" type="OperationInsClosingVO">
+		<result property="OPNumber" column="OPNumber" />
+		<result property="instructionDate" column="InstructionDate" />
+		<result property="dueDate" column="dueDate" />
+		<result property="processCode" column="PROCESS_CODE" />
+		<result property="workplaceCode" column="WORKPLACE_CODE" />
+		<result property="indicatedQuantity" column="IndicatedQuantity" />
+		<result property="sumPerformanceQuantity" column="performanceQuantity" />
+		<result property="remainingPerformance" column="remainingPerformance" />
+		<result property="unitPrice" column="unitPrice" />
+		<result property="price" column="price" />
+		<result property="inspection" column="inspection" />
+		<result property="note" column="note" />
+		<result property="workOrderNumber" column="workOrderNumber" />
+
+		<collection property="OpePerRegDetResult" column="workOrderNumber" select="selectAllOperationRegistDetail"></collection>
+		<!--
+		<collection property="itemResult" column="itemCode" select="selectitemList"></collection>
+		-->
+	</resultMap>
+	
+	<!-- 생산계획 CRUD -->
+	<select id="selectAllProductionPlanInfo" resultMap="SmBimResult">
+		<![CDATA[select * from CPM_PM_PRO_PLA_REG where Item_Code = #{itemCode}]]>
+	</select>
+	
+	<select id="selectAllProductionPlanInfoCondition" parameterType="CommitOperationInstructionVO" resultMap="SmBimResult">
+		<![CDATA[select * from CPM_PM_PRO_PLA_REG]]>
+		<where>
+			<if test="startDate != '' and startDate != null">
+				item_Code = #{itemCode} and SCHEDULEDDATEOFOPERATION between #{startDate} and #{endDate}
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectAllOperationRegistInfoCondition" parameterType="CommitOperationInstructionVO" resultMap="OpePerRegResult">
+		<![CDATA[select * from CPM_PM_Ope_Per_Reg ]]>
+		<where>
+			<if test="startDate != '' and startDate != null">
+				instructionDate between #{startDate} and #{endDate}
+			</if>
+			<if test="endDate != '' and endDate != null">
+				and dueDate between #{startDate} and #{endDate}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insertProductionPlan" parameterType="CommitOperationInstructionVO">
+		<![CDATA[
+		 insert into CPM_PM_PRO_PLA_REG
+		 values(F_GET_NEXT_SEQ('CPM_PM_Pro_Pla_Reg'), #{itemCode}, #{itemName}, #{standard}, #{inventoryUnit}, #{dailyProduction}, F_GET_NEXT_SEQ('SEQ'), #{scheduled}, #{quantity}, #{note}, '생산')
+		]]>  
+	</insert>
+	
+	<update id="updateProductionPlan" parameterType="CommitOperationInstructionVO">
+		<![CDATA[
+		update CPM_PM_PRO_PLA_REG
+		set SCHEDULEDDATEOFOPERATION = #{scheduled}, quantity = #{quantity}, note = #{note}
+		where productionPlanCode = #{productionPlanCode}
+		]]>  
+	</update>	
+	
+	<delete id="deleteProductionPlan">
+		<![CDATA[delete from CPM_PM_PRO_PLA_REG where productionPlanCode = #{productionPlanCode}]]>
+	</delete>
+	
+	<select id="checkStockView" resultMap="SmBimResult">
+		<![CDATA[select * from PM_SM_PRO_STOCK where item_Code in (select item_Code from CPM_BIM_BOM_REG where parent_Item_Code = #{itemCode})]]>
+	</select>
+	
+	<select id="checkStockQuantity" resultMap="SmBimResult">
+		<![CDATA[select MIN(QUANTITY) AS QUANTITY from PM_SM_PRO_STOCK where item_Code in (select item_Code from CPM_BIM_BOM_REG where parent_Item_Code = #{itemCode})]]>
+	</select>
+	
+	<!-- 작업지시 CURD -->
+	<select id="selectAllOperationRegistInfo" parameterType="CommitOperationInstructionVO" resultMap="OpePerRegResult">
+		<![CDATA[select * from OperationRegistInfoVIEW]]>
+	</select>
+	<insert id="insertOperationInstruction" parameterType="OperationRegistVO">
+		<![CDATA[
+		 insert into CPM_PM_OPE_PER_REG
+		 values(F_GET_NEXT_SEQ('CPM_PM_Ope_Per_Reg'), '출고대기', #{processCode},#{workplaceCode}, #{instructionDate}, #{dueDate}, #{itemCode}, #{itemName}, #{standard}, #{inventoryUnit}, #{indicated}, '계획','작업지시','비검사', #{note}, #{productionPlanCode}, #{productionFacility}, #{taskTeam})
+		]]>  
+	</insert>
+	<update id="updateOperationInstruction" parameterType="OperationRegistVO">
+		<![CDATA[
+		update CPM_PM_OPE_PER_REG
+		set dueDate = #{dueDate}, indicatedQuantity = #{indicated}, note = #{note}, productionFacility=#{productionFacility}, taskTeam = #{taskTeam}
+		where  workOrderNumber = #{workOrderNumber}
+		]]>  
+	</update>	
+	<delete id="deleteOperationInstruction">
+		<![CDATA[delete from CPM_PM_OPE_PER_REG where workOrderNumber = #{workOrderNumber}]]>
+	</delete>
+	
+	<!-- 작업지시 등록 팝업부 -->
+	
+	<resultMap id="FacilitySearchResult" type="FacilitySearchVO">
+		<result property="productionFacility" column="productionFacility" />
+		<result property="taskTeam" column="taskTeam" />
+	</resultMap>
+	
+	<select id="selectFacilitySearch" resultMap="FacilitySearchResult">
+		<![CDATA[select * from SM_BIM_PRO_LINE_REG]]>
+	</select>
+	
+	
+	<!-- 작업지시 확정 CRUD -->
+	<select id="selectAllOperationRegistDetail" resultMap="OpePerRegDetResult">
+		<![CDATA[select * from CPM_PM_Pro_Mat_For_Det where workOrderNumber = #{number} ]]>
+	</select>
+	
+	<select id="checkConfirmDetail" resultType="String">
+		<![CDATA[select status from CPM_PM_Ope_Per_Reg where workOrderNumber = #{obj}]]>
+	</select>
+	
+	<!-- 작업지시확정 추가 기능 -->
+	
+	<update id="updConfirmDetail">
+		<![CDATA[
+		update CPM_PM_OPE_PER_REG
+		set status = '확정'
+		where  workOrderNumber = #{workOrderNumber} and status = '계획'
+		]]>  
+	</update>	
+	
+	<update id="updRevertDetail">
+		<![CDATA[
+		update CPM_PM_OPE_PER_REG
+		set status = '계획'
+		where  workOrderNumber = #{workOrderNumber} and status = '확정'
+		]]>  
+	</update>	
+	
+	
+	<select id="countWorkOrderNumber" resultType="string">
+		<![CDATA[select count(*) from CPM_PM_PRO_MAT_FOR_DET where workOrderNumber = #{number}]]>
+	</select>
+	
+	<select id="selectRelease" resultMap="OpePerRegResult">
+		<![CDATA[select * from CPM_PM_Ope_Per_Reg where workOrderNumber = #{workOrderNumber}]]>
+	</select>
+	
+	<select id="selectReleaseDetail" resultMap="OpePerRegResult">
+		<![CDATA[SELECT * FROM releasedetailview where WORKORDERNUMBER = #{number}]]>
+	</select>
+	
+	<!-- 작업지시확정 자재출고 CRUD -->
+	<insert id="insertReleaseData" parameterType="OperationDetailVO">
+		<![CDATA[
+		 insert into CPM_PM_PRO_MAT_FOR_DET
+		 values(F_GET_NEXT_SEQ('PM_SM_Sto_Mov_Main'), SYSDATE, #{itemCode}, #{itemName}, #{standard}, #{inventoryUnit}, #{precisionQuantity}, #{loss}, 
+		 #{forwardingQuantity}, #{note}, #{workOrderNumber} )
+		]]>  
+	</insert>
+	
+	<!-- 입,출고시 자재 수량 변경 -->
+	<update id="updateStockQuantity">
+		<![CDATA[update PM_SM_PRO_STOCK 
+				set quantity =  quantity - #{forwardingQuantity}
+				where item_Code = #{itemCode}]]>
+	</update>
+	
+	<update id="deleteStockQuantity">
+		<![CDATA[update PM_SM_PRO_STOCK 
+				set quantity =  quantity + #{forwardingQuantity}
+				where item_Code = #{itemCode}]]>
+	</update>
+	<select id="selectWorkOrderNumber" resultType="string">
+		<![CDATA[select workOrderNumber from CPM_PM_PRO_MAT_FOR_DET where FORWARDINGNUMBER = #{forwardingNumber}]]>
+	</select>
+	
+	<update id="materialSet">
+		<![CDATA[update CPM_PM_OPE_PER_REG
+		set MATERIALFORWARDINGSTATUS = '출고대기'
+		where workOrderNumber = #{workOrderNumber}]]>
+	</update>
+	
+	<delete id="deleteCommitOperation" parameterType="OperationDetailVO">
+		<![CDATA[delete from CPM_PM_PRO_MAT_FOR_DET where FORWARDINGNUMBER = #{forwardingNumber}]]>
+	</delete>
+	
+	<update id="updateMaterialUse">
+		<![CDATA[update CPM_PM_OPE_PER_REG
+		set MATERIALFORWARDINGSTATUS = '출고완료'
+		where workOrderNumber = #{workOrderNumber}]]>
+	</update>
+	<!-- 작업실적등록 CRUD -->
+	
+<resultMap id="RegistOperationPerformanceResult" type="RegistOperationPerformanceVO">
+	<result property="workOrderNumber" column="workordernumber" />
+	<result property="materialstatus" column="materialforwardingstatus" />
+	<result property="workplaceCode" column="workplaceCode" />
+	<result property="instructionDate" column="instructiondate" />
+	<result property="dueDate" column="duedate" />
+	<result property="itemCode" column="item_code" />
+	<result property="itemName" column="item_name" />
+	<result property="standard" column="standard" />
+	<result property="inventoryUnit" column="inventory_unit" />
+	<result property="indicated" column="indicatedquantity" />
+	<result property="sumPerformanceQuantity" column="sumPerformancequantity" />
+	<result property="remainingPerformance" column="remainingPerformance" />
+	<result property="status" column="status" />
+	<result property="workSortation" column="worksortation" />
+	<result property="inspection" column="inspection" />
+	<result property="note" column="note" />
+	<result property="productionFacility" column="productionfacility" />
+	<result property="taskTeam" column="taskTeam" />
+</resultMap>	
+<resultMap id="RegistOperationPerformanceResultDetail" type="RegistOperationPerformanceDetailVO">
+	<result property="opNumber" column="opNumber" />
+	<result property="materialUseStatus" column="materialUseStatus" />
+	<result property="houseCode" column="func_hou_reg(House_Code)" />
+	<result property="performanceDate" column="performanceDate" />
+	<result property="processCode" column="PROCESS_CODE" />
+	<result property="workplaceCode" column="WORKPLACE_CODE" />
+	<result property="sortation" column="sortation" />
+	<result property="performanceQuantity" column="performanceQuantity" />
+	<result property="inspection" column="inspection" />
+	<result property="note" column="note" />
+	<result property="workOrderNumber" column="workOrderNumber" />
+</resultMap>	
+
+		<select id="selectAllRegistOperationPerformanceInfoCondition" resultMap="RegistOperationPerformanceResult">
+		<![CDATA[SELECT * FROM RegistOperationPerformanceVIEW]]>
+	</select>
+	
+	<select id="selectAllRegistOperationPerformanceInfo" resultMap="RegistOperationPerformanceResult">
+		<![CDATA[select *
+from CPM_PM_Ope_Per_Reg
+where (status = '확정' or status = '마감')
+]]>
+	</select>
+	
+		<select id="selectAllRegistOperationPerformanceInfoDetail" resultMap="RegistOperationPerformanceResultDetail">
+		<![CDATA[SELECT * FROM RegOpePerformanceDetailVIEW where workOrderNumber = #{workOrderNumber}
+]]>
+	</select>
+	
+	
+	
+	<insert id="insertRegistOperationPerformanceInfoDetail" parameterType="RegistOperationPerformanceDetailVO">
+		<![CDATA[
+		
+		 insert into CPM_PM_Ope_Per_Reg_Det
+		 values(F_GET_NEXT_SEQ('CPM_PM_Ope_Per_Reg_Det'),'무', #{performanceDate}, #{sortation}, #{performanceQuantity}, #{inspection},#{houseCode},#{note}, #{workOrderNumber})
+		]]>  
+	</insert>
+
+	
+	<select id="checkMaterialUse" resultType="string">
+		<![CDATA[select materialUseStatus from CPM_PM_Ope_Per_Reg_Det where opNumber = #{opNumber}]]>
+	</select>
+	
+	<update id="updMaterialUse">
+		<![CDATA[
+		update CPM_PM_Ope_Per_Reg_Det
+		set materialUseStatus = '유'
+		where  OPNumber = #{OPNumber} and materialUseStatus = '무'
+		]]>  
+	</update>	
+	
+		<delete id="deleteRegistOperationPerformanceInfoDetail" parameterType="RegistOperationPerformanceDetailVO">
+		<![CDATA[delete from CPM_PM_Ope_Per_Reg_Det where opNumber = #{opNumber}]]>
+	</delete>
+	
+	<resultMap id="performanceQuantityResult" type="PerformanceQuantityVO">
+		<result property="performanceQuantity" column="performanceQuantity" />
+		<result property="itemCode" column="item_Code" />
+		<result property="division" column="division" />
+	</resultMap>
+	
+	<select id="selectperformanceQuantity" resultMap="performanceQuantityResult">
+		<![CDATA[select reg.performancequantity, cpm.item_Code,bom.division from CPM_PM_OPE_PER_REG cpm, CPM_PM_OPE_PER_REG_DET reg, SM_BIM_ITE_REG bom
+					where cpm.workOrderNumber = reg.workordernumber and cpm.item_Code = bom.item_code and reg.opNumber = #{obj}]]>
+	</select>
+	
+	<update id="updAddStock">
+		<![CDATA[update PM_SM_PRO_STOCK 
+				set quantity =  quantity + #{performanceQuantity}
+				where item_Code = #{itemCode} ]]>
+	</update>
+	
+	<update id="updAddFinalStock">
+		<![CDATA[update PM_SM_PRO_FINISHEDPRODUCT 
+				set quantity =  quantity + #{performanceQuantity}
+				where item_Code = #{itemCode} ]]>
+	</update>
+	<!-- 작업실적등록 팝업부  -->
+	
+	<resultMap id="HouseCodeSearchResult" type="HouseCodeSearchVO">
+		<result property="houseCode" column="house_Code" />
+		<result property="houseName" column="house_Name" />
+	</resultMap>
+	
+	<select id="selectHouseCodeList" resultMap="HouseCodeSearchResult">
+		<![CDATA[select * from SM_BIM_HOU_REG]]>
+	</select>
+	
+	<resultMap id="ProcessCodeSearchResult" type="ProcessCodeSearchVO">
+		<result property="processCode" column="process_Code" />
+		<result property="processName" column="process_Name" />
+	</resultMap>
+	
+	<select id="selectProcessCodeList" resultMap="ProcessCodeSearchResult">
+		<![CDATA[select * from SM_BIM_PRO_REG]]>
+	</select>
+	
+	<resultMap id="WorkplaceCodeSearchResult" type="WorkplaceCodeSearchVO">
+		<result property="workplaceCode" column="workplace_Code" />
+		<result property="workplaceName" column="workplace_Name" />
+	</resultMap>
+	
+	<select id="selectWorkplaceCodeList" resultMap="WorkplaceCodeSearchResult">
+		<![CDATA[select * from SM_BIM_PRO_WOR_REG]]>
+	</select>
+	
+		<!-- 기초정보등록 품목등록 -->
+		<resultMap id="itemResult" type="itemVO">
+		<result property="item_Code" column="Item_Code"	/>
+		<result property="item_Name" column="Item_Name"	/>
+		<result property="standard" column="Standard"	/>
+		<result property="inventory_Unit" column="Inventory_Unit"	/>
+		<result property="whether_LOT" column="Whether_LOT"	/>
+		<result property="sET_Item" column="SET_Item"	/>
+		<result property="inspection_Status" column="Inspection_Status"	/>
+		<result property="use_Status" column="Use_Status"	/>
+		<result property="lOT_Quantity" column="LOT_Quantity"	/>
+		<result property="drawing_Number" column="Drawing_Number"	/>
+		<result property="hs_Code" column="Hs_Code"	/>
+		<result property="width" column="Width"	/>
+		<result property="length" column="Length"	/>
+		<result property="height" column="Height"	/>
+		<result property="cost" column="Cost"	/>
+		<result property="item_Group_Code" column="Item_Group_Code"	/>
+		<result property="division" column="Division"	/>
+		<result property="notes" column="Notes"	/>
+		<result property="daily_production" column="Daily_production"	/>
+		</resultMap>
+	<!-- 조회 -->
+		<select id="selectitemList" resultMap="itemResult">
+		<![CDATA[select item_Code,item_Name,standard from SM_BIM_Ite_Reg]]>	
+	</select>
+	<select id="selectAllitemList" resultMap="itemResult" parameterType="String">
+		<![CDATA[select * from SM_BIM_Ite_Reg where item_Code = #{item_Code}]]>	
+	</select>
+	
+	<!-- 작업지시 마감처리 CRUD -->
+		<select id="selectAllOperationInsClosingInfoCondition" parameterType="CommitOperationInstructionVO" resultMap="OpePerRegResult">
+		<![CDATA[select * from OperationInsClosingVIEW ]]>
+		<where> status = '확정' or status = '마감'
+			<if test="startDate != '' and startDate != null">
+				and instructionDate between #{startDate} and #{endDate}
+			</if>
+			<if test="endDate != '' and endDate != null">
+				and dueDate between #{startDate} and #{endDate}
+			</if>
+		</where>
+	</select>
+	
+		<select id="selectAllOperationInsClosingInfo" parameterType="CommitOperationInstructionVO" resultMap="OpePerRegResult">
+		<![CDATA[select * from OperationInsClosingVIEW where status = '확정' or status = '마감' ]]>
+	</select>
+	
+	<select id="selectAllOperationInsClosingDetail" resultType="OperationInsClosingVO" >
+		<![CDATA[SELECT * FROM OperationInsClosingDetailVIEW
+WHERE workOrderNumber=#{workOrderNumber}]]>
+	</select>
+	
+	<select id="checkClosingDetail" resultType="string">
+		<![CDATA[select status from CPM_PM_Ope_Per_Reg where workOrderNumber = #{workOrderNumber}]]>
+	</select>
+	
+	<update id="updClosingDetail">
+		<![CDATA[
+		update CPM_PM_OPE_PER_REG
+		set status = '마감'
+		where  workOrderNumber = #{workOrderNumber} and status = '확정'
+		]]>  
+	</update>
+	
+	<update id="updCancleClosingDetail">
+		<![CDATA[
+		update CPM_PM_OPE_PER_REG
+		set status = '확정'
+		where  workOrderNumber = #{workOrderNumber} and status = '마감'
+		]]>  
+	</update>	
+	
+	<!-- 생산 팝업 파트 -->	
+	<resultMap id="ItemCodeResult" type="ItemCodePopVO">
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="inventoryUnit" column="inventory_Unit" />
+		<result property="dailyProduction" column="dailyProduction" />
+	</resultMap>
+	<select id="selectItemCodeView" resultMap="ItemCodeResult">
+		<![CDATA[select * from SM_BIM_Ite_Reg where Division in ('완제품','반제품')]]>
+	</select>
+	<resultMap id="FactoryViewResult" type="FactoryViewVO">
+		<result property="workplaceCode" column="workplace_Code" />
+		<result property="workplaceName" column="workplace_Name" />
+	</resultMap>
+	<select id="selectFactoryList" resultMap="FactoryViewResult">
+		<![CDATA[select * from SM_CRI_Wor_Reg]]>
+	</select>
+	<resultMap id="DepartmentViewResult" type="DepartmentViewVO">
+		<result property="departmentCode" column="department_Code" />
+		<result property="departmentName" column="department_Name" />
+	</resultMap>
+	<select id="selectDepartmentList" resultMap="DepartmentViewResult">
+		<![CDATA[select* from SM_CRI_Dep_Reg]]>
+	</select>
+	<resultMap id="selectProductionPlanViewResult" type="ProductionPalnViewVO">
+		<result property="productionPlanCode" column="ProductionPlanCode" />
+		<result property="itemCode" column="item_code" />
+		<result property="itemName" column="item_Name" />
+		<result property="standard" column="standard" />
+		<result property="inventoryUnit" column="inventory_unit" />
+		<result property="dailyProduction" column="dailyProduction" />
+		<result property="sequence" column="sequence" />
+		<result property="schedule" column="scheduleddateofoperation" />
+		<result property="quantity" column="quantity" />
+		<result property="note" column="note" />
+	</resultMap>
+	<select id="selectProductionPlanList" parameterType="CommitOperationInstructionVO" resultMap="selectProductionPlanViewResult">
+		<![CDATA[select * from CPM_PM_Pro_Pla_Reg where scheduleddateofoperation between #{startDate} and #{endDate}]]>
+	</select>
+	 	 
+	<!-- 재공현황 파트 -->
+	
+	<resultMap id="selectWorkInProcessResult" type="WorkInProcessVO">
+		<result property="itemCode" column="item_Code" />
+		<result property="itemName" column="item_Name" />
+		<result property="standard" column="standard" />
+		<result property="inventoryUnit" column="inventory_Unit" />
+		<result property="indicatedQuantity" column="INDICATEDQUANTITY" />
+		<result property="sumPerformanceQuantity" column="SUMPERFORMANCEQUANTITY" />
+		<result property="remainingPerformance" column="REMAININGPERFORMANCE" />
+	</resultMap>
+	
+	<select id="selectAllWorkInProcess" resultMap="selectWorkInProcessResult">
+		<![CDATA[select item_code, item_name, standard, inventory_unit, sum(indicatedquantity) as indicatedquantity, sum(sumperformancequantity) as sumperformancequantity, sum(remainingperformance) as remainingperformance from REGISTOPERATIONPERFORMANCEVIEW
+				group by item_code, item_name, standard, inventory_unit order by item_Code ]]>
+	</select>
+	
+	<select id="selectAllWorkInProcessCondition" resultMap="selectWorkInProcessResult">
+		<![CDATA[select item_code, item_name, standard, inventory_unit, sum(indicatedquantity) as indicatedquantity, sum(sumperformancequantity) as sumperformancequantity, sum(remainingperformance) as remainingperformance from REGISTOPERATIONPERFORMANCEVIEW
+				where item_Code = #{itemCode}
+				group by item_code, item_name, standard, inventory_unit order by item_Code]]>
+	</select>
+	
+	<!-- BOM 파트 -->
+	<resultMap id="bomView" type="bomVO">
+		<result property="no" column="no" />
+		<result property="parent" column="PARENT_ITEM_CODE" />
+		<result property="itemNumber" column="item_code" />
+		<result property="itemName" column="item_name" />
+		<result property="standard" column="standard" />
+		<result property="unit" column="inventory_unit" />
+		<result property="precisionQuantity" column="precisionQuantity" />
+		<result property="loss" column="loss" />
+		<result property="division" column="division" />
+		<result property="cost" column="cost"/>
+	</resultMap>
+	<resultMap id="popView" type="bomVO">
+		<result property="itemNumber" column="item_code" />
+		<result property="itemName" column="item_name" />
+		<result property="standard" column="standard" />
+	</resultMap>
+	<resultMap id="outpopView" type="bomVO">
+		<result property="itemNumber" column="outSourcing_code" />
+		<result property="itemName" column="outsourcing_name" />
+	</resultMap>
+	<resultMap id="outpopViewex" type="bomVO">
+		<result property="itemNumber" column="Workplace_Code" />
+		<result property="itemName" column="Workplace_Name" />
+	</resultMap>
+	
+	<select id="selectAllMemberList" resultMap="bomView">
+		<![CDATA[select * from CPM_BIM_BOM_REG]]>
+	</select>
+	<select id="selectNo" resultType="int">
+		<![CDATA[select MAX(no) from CPM_BIM_BOM_REG]]>
+	</select>
+	<select id="searchitem" resultMap="bomView"
+		parameterType="String">
+		<![CDATA[select * from CPM_BIM_BOM_REG where parent_item_code = #{parent} order by division desc]]>
+	</select>
+	<select id="researveView" resultMap="bomView"
+		parameterType="String">
+		<![CDATA[select ite.item_code, ite.item_name,ite.standard,ite.inventory_unit,bom.precisionquantity,bom.loss, ite.division
+from cpm_bim_bom_Reg bom, sm_bim_ite_reg ite
+where bom.parent_item_code = ite.item_code and bom.item_code = #{number}
+order by bom.parent_item_code]]>
+	</select>
+	<select id="inputItem" resultMap="bomView"
+		parameterType="String">
+		<![CDATA[select no,item_code,item_name,standard,inventory_unit,COST from cpm_bim_bom_reg where item_code=#{itemNumber}]]>
+	</select>
+	<select id="selectPopList1" resultMap="popView">
+		<![CDATA[select * from SM_BIM_Ite_Reg where not division='부품' order by division desc]]>
+	</select>
+	<select id="selectPopList2" resultMap="popView">
+		<![CDATA[select * from SM_BIM_Ite_Reg where not division = '완제품' order by division desc]]>
+	</select>
+	<select id="outPopSearch" resultMap="popView" parameterType="String">
+		<![CDATA[ select *
+		  from SM_BIM_Ite_Reg
+		  where Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	<select id="bomPopSearch1" resultMap="popView" parameterType="String">
+		<![CDATA[ select *
+		  from SM_BIM_Ite_Reg
+		  where not division='부품' and Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	<select id="bomPopSearch2" resultMap="popView" parameterType="String">
+		<![CDATA[ select *
+		  from SM_BIM_Ite_Reg
+		  where not division='완제품' and Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	
+	<insert id="insertBOM" parameterType="bomVO">
+		<![CDATA[
+		 insert into CPM_BIM_BOM_REG(NO,PARENT_ITEM_CODE,ITEM_CODE,ITEM_NAME,STANDARD,INVENTORY_UNIT,PRECISIONQUANTITY,LOSS,DIVISION)
+		 values(#{no},#{parent}, #{itemNumber}, #{itemName}, #{standard}, #{unit}, #{precisionQuantity}, #{loss}, #{division})
+		]]>  
+	</insert>
+
+	<delete id="deleteBOM">
+		delete from CPM_BIM_BOM_REG where NO = #{no}
+	</delete>
+ 
+	<update id="updateBOM" parameterType="bomVO">
+		<![CDATA[
+		update CPM_BIM_BOM_REG
+		set Item_Name=#{itemName}, Standard=#{standard}, Inventory_Unit=#{unit},precisionQuantity=#{precisionQuantity}, loss=#{loss}, division=#{division}
+		where  no=#{no}
+		]]>  
+	</update>
+	<select id="outView" resultMap="outpopView">
+		<![CDATA[select outsourcing_code,outsourcing_name from sm_bim_out_reg order by outsourcing_code]]>
+	</select>
+	<select id="outViewex" resultMap="outpopViewex" parameterType="String">
+		<![CDATA[select workplace_code,workplace_name from sm_bim_out_wor_reg order by workplace_code]]>
+	</select>
+	
+	
+	<!-- 외주단가등록 -->
+	<resultMap id="outpriView" type="outpriVO">
+		<result property="outsourcing_Code" column="OUTSOURCING_CODE" />
+		<result property="outcustomer" column = "OUTCUSTOMER"/>
+		<result property="item_code" column="ITEM_CODE" />
+		<result property="outprice" column="OUTSOURCINGUNITPRICE" />
+		<result property="startDate" column="STARTDATE" />
+		<result property="endDate" column="ENDDATE" />
+		<collection property="bomVO" resultMap="bomView"></collection>
+	</resultMap>
+	
+	<select id="outpriceView" resultMap="outpriView" parameterType="java.util.HashMap">
+		<![CDATA[SELECT * FROM outPriceView
+		where outsourcing_code = #{0} and outcustomer=#{1}]]>
+	</select>
+	<insert id="addoutprice" parameterType="outpriVO">
+		<![CDATA[
+		 insert into CPM_BIM_OUT_PRI
+		 values(#{outsourcing_Code},#{outcustomer}, #{item_code}, #{outprice}, #{startDate}, #{endDate})
+		]]>  
+	</insert>
+	<update id="udpoutprice" parameterType="outpriVO">
+		<![CDATA[
+		update CPM_BIM_OUT_PRI
+		set OUTSOURCINGUNITPRICE = #{outprice}, STARTDATE=#{startDate},ENDDATE=#{endDate}
+		where  outsourcing_Code=#{outsourcing_Code} and outcustomer=#{outcustomer} and item_code=#{item_code}
+		]]>  
+	</update>
+	<delete id="deloutprice" parameterType="outpriVO">
+		delete from CPM_BIM_OUT_PRI where outsourcing_code = #{outsourcing_Code} and outcustomer=#{outcustomer} and item_code=#{item_code}
+	</delete>
+	<!-- 불량유형등록 -->
+	<resultMap id="defTypeView" type="defVO">
+		<result property="defectCode" column="DEFECTCODE" />
+		<result property="defectiveTypeName" column = "DEFECTIVETYPENAME"/>
+		<result property="defectiveItemGroupCode" column="DEFECTIVEITEMGROUPCODE" />
+		<result property="defectiveItemGroup" column="DEFECTIVEITEMGROUP" />
+		<result property="usageStatus" column="USAGESTATUS" />
+		<result property="defectiveDescription" column="DEFECTIVEDESCRIPTION" />
+	</resultMap>
+	<resultMap id="defGroupView" type="defVO">
+		<result property="defectiveItemGroupCode" column="DEFECTIVETYPENAME" />
+		<result property="defectiveItemGroup" column="DEFECTIVEITEMGROUPCODE" />
+	</resultMap>
+	<select id="defectiveView" resultMap="defTypeView" parameterType="String">
+		<![CDATA[select * from cpm_bim_def_typ_reg where DEFECTIVEITEMGROUPCODE=#{defGroupCode} order by defectcode]]>
+	</select>
+	<insert id="addDefType" parameterType="defVO">
+		<![CDATA[
+		 insert into cpm_bim_def_typ_reg
+		 values(#{defectCode},#{defectiveTypeName}, #{defectiveItemGroupCode}, #{defectiveItemGroup}, #{usageStatus}, #{defectiveDescription})
+		]]>  
+	</insert>
+	<update id="updDefType" parameterType="defVO">
+		<![CDATA[
+		update cpm_bim_def_typ_reg
+		set DEFECTCODE = #{defectCode}, DEFECTIVETYPENAME=#{defectiveTypeName},DEFECTIVEITEMGROUPCODE=#{defectiveItemGroupCode},DEFECTIVEITEMGROUP=#{defectiveItemGroup},USAGESTATUS=#{usageStatus},DEFECTIVEDESCRIPTION=#{defectiveDescription}
+		where DEFECTCODE=#{oridefectCode}
+		]]>  
+	</update>
+	<select id="defGroupView" resultMap="defGroupView" >
+		<![CDATA[select * from cpm_bim_def_group order by defectiveTypeName]]>
+	</select>
+	<insert id="addDefpop" parameterType="defVO">
+		<![CDATA[
+		 insert into cpm_bim_def_group
+		 values(#{defectiveItemGroupCode}, #{defectiveItemGroup})
+		]]>  
+	</insert>
+	<delete id="deldeftype">
+		delete from cpm_bim_def_typ_reg where DEFECTCODE = #{no}
+	</delete>
+	<delete id="deldefPop" >
+		delete from cpm_bim_def_group where DEFECTIVETYPENAME = #{no}
+	</delete>
+
+	<select id="selectitem" resultMap="bomView"
+		parameterType="String">
+		<![CDATA[
+		select item_code,item_name,standard,inventory_unit,division from SM_BIM_ITE_REG where item_code=#{itemNumber}]]>
+	</select>
+	<select id="selectoutitem" resultMap="bomView"
+		parameterType="String">
+		<![CDATA[
+		select item_code,item_name,standard,inventory_unit,COST from SM_BIM_ITE_REG where item_code=#{itemNumber}]]>
+	</select>
+	<select id="selectPopList" resultMap="popView">
+		<![CDATA[select * from CPM_BIM_BOM_REG]]>
+	</select>
+	
+	
+<!-- 구매관리파트 -->
+	<!-- mainPaln 주계획 -->
+	<resultMap id="MPSResult" type="mainplanVO">
+		<result property="planNO" column="planNO" />
+		<result property="plandate" column="plandate" />
+		<result property="item_Code" column="item_Code" />
+		<result property="item_Name" column="item_Name" />
+		<result property="standard" column="standard" />
+		<result property="inventory_unit" column="inventory_unit" />
+		<result property="sequence" column="sequence" />
+		<result property="expectedDate" column="expectedDate" />
+		<result property="dueDate" column="dueDate" />
+		<result property="plan_quantity" column="plan_quantity" />
+		<result property="general_Customer_Name" column="general_Customer_Name" />
+		<result property="note" column="note" />
+ 		<result property="startDate" column="startDate" />
+		<result property="endDate" column="endDate" />
+	</resultMap>
+	<resultMap type="mpsosVO" id="MpsOSResult">
+		<result column="orderno" property="orderno" />
+		<result column="sequence" property="sequence" />
+		<result column="ordersdate" property="ordersdate" />
+		<result column="general_Customer_Name" property="general_Customer_Name" />
+		<result column="item_Code" property="item_Code" />
+		<result column="item_Name" property="item_Name" />
+		<result column="standard" property="standard" />
+		<result column="inventory_unit" property="inventory_unit" />
+		<result column="ordersQuantity" property="ordersQuantity" />
+		<result column="expectedDate" property="expectedDate" />
+		<result column="note" property="note" />
+
+	</resultMap>
+	<select id="selectAllMainPlanList" resultMap="MPSResult">
+		<![CDATA[ select cc.Item_Code, cc.Item_Name, cc.standard, cc.Inventory_Unit,
+   				cc.dueDate, cc.expectedDate,
+  				mp.plandate, mp.plan_Quantity, mp.general_Customer_Name, mp.note
+   				from CSM_SM_COR_Reg cc, PMM_PM_MPS mp
+   				where cc.Item_Code = mp.Item_Code]]>
+	</select>
+	
+ 	<delete id="deleteMps">
+		delete from pmm_pm_mps where sequence = #{sequence}
+	</delete>
+  	<select id="selectAllMpsosList" resultMap="MpsOSResult" parameterType="java.util.HashMap">
+		<![CDATA[select distinct co.Note,
+            cc.Item_Code, cc.Item_Name, cc.standard, cc.Inventory_Unit,
+            cc.expectedDate,cc.ordersQuantity
+            from CSM_SM_Ord_Reg co, CSM_SM_COR_Reg cc
+          where cc.general_customer_code=co.general_customer_code]]>
+	</select>
+	<update id="updateMPS" parameterType="MainPlanVO">
+		<![CDATA[update pmm_pm_mps
+			SET  plandate=#{plandate},plan_quantity=#{plan_quantity},expectedDate=#{expectedDate},dueDate=#{dueDate}
+			where planNO = #{planNO}]]>
+	</update>
+	<insert id="insertMPS" parameterType="MainPlanVO">
+		<![CDATA[insert into pmm_pm_mps(planNO,plandate,item_Code,item_Name,standard,inventory_unit,sequence,
+				expectedDate,dueDate,plan_quantity,general_Customer_Name,note)
+			values(F_GET_NEXT_SEQ('PMM_PM_MPS'),#{plandate},#{item_Code},#{item_Name},#{standard},#{inventory_unit},
+			F_GET_NEXT_SEQ('SEQ'),#{expectedDate}, #{dueDate}, #{plan_quantity}, #{general_Customer_Name}, #{note})
+		]]>
+	</insert>
+		
+ 	<select id="searchMPSOS" resultMap="MpsOSResult">
+		<![CDATA[ select item_Code, item_Name ,ordersQuantity,expectedDate
+		  	from CSM_SM_COR_Reg
+		 	 where item_Name like '%'||#{item_Name}||'%']]>
+	</select>
+	
+  	<select id="searchMRP" resultMap="MPSResult" parameterType="String">
+		<![CDATA[select * from pmm_pm_mps where item_code = #{item_code}]]>
+	</select>
+	
+	<select id="selectMRP" resultMap="MpsOSResult" parameterType="String">
+		<![CDATA[select general_Customer_Name,item_code,item_name,standard,inventory_unit,note from pmm_pm_mps_os where item_code=#{item_code}]]>
+	</select>
+	
+	<select id="selectSeq" resultType="int">
+		<![CDATA[select MAX(sequence) from pmm_pm_mps]]>
+	</select>
+	
+	<select id="inputMRP" resultMap="MPSResult" parameterType="String">
+		<![CDATA[select * from pmm_pm_mps where item_code=#{item_code}]]>
+	</select>
+	
+		<select id="Listbuyer" resultMap="basicInfoResult">
+		<![CDATA[select general_Customer_Code,general_Customer_Name from SM_BIM_Gen_Cus_Reg ]]>	
+	</select>
+	
+	 <select id="Searchbuyer" resultMap="basicInfoResult">
+		<![CDATA[ select general_Customer_Code, general_Customer_Name
+		  	from SM_BIM_Gen_Cus_Reg
+		 	 where general_Customer_Name like '%'||#{general_Customer_Name}||'%']]>
+	</select>
+	<!-- billing 청구등록 -->
+	<resultMap id="billingResult" type="billingVO">
+ 		<result property="sequence" column="sequence" />
+		<result property="claim_no" column="claim_no" />
+		<result property="claim_date" column="claim_date" />
+		<result property="claim_division" column="claim_division" />
+		<result column="item_Code" property="item_Code" />
+		<result column="item_Name" property="item_Name" />
+		<result column="standard" property="standard" />
+		<result column="requestdate" property="requestdate" />
+		<result column="inventory_qty" property="inventory_qty" />
+		<result column="claim_quantity" property="claim_quantity" />
+		<result column="buyer" property="buyer" />		
+		<result property="note" column="note" />
+	</resultMap>
+
+	<select id="selectAllcmList" resultMap="billingResult" parameterType="MainPlanVO">
+		<![CDATA[SELECT * from PMM_PM_CM]]>
+	<where>
+		<if test="startDate != '' and startDate != null">claim_date between #{startDate} and #{endDate} </if>
+		<if test="endDate != '' and endDate != null">and requestdate between #{startDate} and #{endDate} </if>
+	</where>
+	</select>	
+ 	<delete id="delbilling">
+		delete from PMM_PM_CM where sequence = #{sequence}
+	</delete>
+	<update id="updatebilling" >
+		<![CDATA[update PMM_PM_CM
+			set claim_division=#{claim_division},requestdate=#{requestdate},inventory_qty=#{inventory_qty},
+			claim_quantity=#{claim_quantity},buyer=#{buyer},note=#{note}
+			where sequence = #{sequence}]]>  
+	</update>
+ 	<insert id="insertbilling" parameterType="billingVO">
+		<![CDATA[insert into PMM_PM_CM
+		values(F_GET_NEXT_SEQ('SEQ'),F_GET_NEXT_SEQ('PMM_PM_CM'),#{claim_date},#{claim_division},#{item_Code},#{item_Name},#{standard},#{requestdate},
+		#{inventory_qty},#{claim_quantity},#{buyer},#{note})
+		]]>
+	</insert> 	
+	
+	<!-- mrp 소요량 -->
+	<resultMap id="mrpResult" type="requiredamountVO">
+		<result property="item_Code" column="item_Code" />
+		<result property="item_Name" column="item_Name" />
+		<result property="standard" column="standard" />
+		<result property="dueDate" column="dueDate" />
+		<result property="sequence" column="sequence" />
+		<result property="expectedDate" column="expectedDate" />
+		<result property="expected_quantity" column="expected_quantity" />
+		<result property="inventory_unit" column="inventory_unit" />
+		<collection property="bomVO" resultMap="bomView"/>
+		<collection property="mainplanVO" resultMap="MPSResult"/>
+	</resultMap>
+
+  	<select id="selectAllMrpList" resultMap="mrpResult" parameterType="java.util.HashMap">
+		<![CDATA[select distinct bom.Parent_Item_Code, bom.item_Code, bom.item_Name,bom.division,
+    		pm.standard, pm.inventory_unit, pm.expectedDate, pm.dueDate, (pm.plan_quantity * bom.PRECISIONQUANTITY) as expected_quantity
+   			from CPM_BIM_BOM_Reg bom, pmm_pm_mps pm
+   			where bom.parent_item_code = pm.item_Code and expectedDate between #{startDate} and #{endDate}
+            
+            union
+            
+			select distinct bom.Item_Group_Code,bom.item_code, bom.item_name,bom.division,
+    		pm.standard, pm.inventory_unit, pm.expectedDate, pm.dueDate, (pm.plan_quantity) as expected_quantity
+   			from sm_bim_ite_reg bom, pmm_pm_mps pm
+   			where bom.division = '부품' and bom.item_code = pm.item_Code and expectedDate between #{startDate} and #{endDate}]]>
+	</select>
+
+		<!-- orderclosing 발주마감 -->
+	<resultMap id="orderclosingResult" type="orderclosingVO">
+		<result property="order_no" column="order_no" />
+		<result property="order_date" column="order_date" />
+		<result property="code" column="code" />
+		<result property="general_Customer_Name" column="general_Customer_Name" />
+		<result property="sequence" column="sequence" />
+		<result property="item_Code" column="item_Code" />
+		<result property="item_Name" column="item_Name" />
+		<result property="standard" column="standard" />
+		<result property="inventory_unit" column="inventory_unit" />
+		<result property="order_quantity" column="order_quantity" />
+		<result property="cost" column="cost" />
+		<result property="deadline" column="deadline" />
+		<result property="note" column="note" />
+	</resultMap>
+	
+	<select id="selectAllClosingList" resultMap="orderclosingResult">
+		<![CDATA[select sequence,order_no,order_date,code,general_Customer_Name,item_Code,item_Name,standard,
+		inventory_unit,order_quantity,cost, order_quantity*cost as applyPrice, 
+		(order_quantity*cost*0.1) as vat, order_quantity*cost+(order_quantity*cost*0.1) 
+		sumPrice,deadline,note
+		from PMM_PM_ORDER]]>
+	<where>
+		<if test="startDate != '' and startDate != null">order_date between #{startDate} and #{endDate} </if>
+		<if test="endDate != '' and endDate != null">and order_date between #{startDate} and #{endDate} </if>
+	</where>
+	</select>
+	
+	<update id="updateOrderClosing">
+		<![CDATA[update PMM_PM_ORDER
+			set deadline = '마감'
+			where sequence=#{sequence}and deadline ='진행']]>
+	</update>
+	<delete id="delClosing">
+		delete from PMM_PM_ORDER where sequence = #{sequence}
+	</delete>
+	<insert id="insertClosing" parameterType="orderclosingVO">
+		<![CDATA[insert into PMM_PM_ORDER(order_no,order_date,general_Customer_Name,sequence,item_Code,item_Name,standard,inventory_unit,order_quantity,cost,note)
+		values(F_GET_NEXT_SEQ('PMM_PM_ORDER'),#{order_date},#{general_Customer_Name},F_GET_NEXT_SEQ('SEQ'),#{item_Code},#{item_Name},#{standard},
+		#{inventory_unit},#{order_quantity},#{cost},#{note})
+		]]>
+	</insert> 
+	<update id="updateClosing" parameterType="orderclosingVO">
+		<![CDATA[update PMM_PM_ORDER
+			SET order_no=#{order_no},order_date=#{order_date},general_Customer_Name=#{general_Customer_Name},sequence=#{sequence},item_Code=#{item_Code},
+			item_Name=#{item_Name},standard=#{standard},inventory_unit=#{inventory_unit},order_quantity=#{order_quantity},cost=#{cost},
+			deadline=#{deadline},note=#{note}
+			where order_no=#{order_no}]]>
+	</update>
+	
+	<select id="itemList" resultMap="regitemResult">
+		<![CDATA[select item_Code,item_Name,cost,standard,inventory_unit from SM_BIM_Ite_Reg]]>	
+	</select>
+	
+	 <select id="NameSearch" resultMap="regitemResult">
+		<![CDATA[ select item_Code, item_Name,cost,standard,inventory_unit
+		  	from SM_BIM_Ite_Reg
+		 	 where item_Name like '%'||#{item_Name}||'%']]>
+	</select>
+	
+	<select id="buyerList" resultMap="basicInfoResult">
+		<![CDATA[select general_Customer_Code,general_Customer_Name from SM_BIM_Gen_Cus_Reg ]]>	
+	</select>
+	
+	 <select id="buyerSearch" resultMap="basicInfoResult">
+		<![CDATA[ select general_Customer_Code, general_Customer_Name
+		  	from SM_BIM_Gen_Cus_Reg
+		 	 where general_Customer_Name like '%'||#{general_Customer_Name}||'%']]>
+	</select>
+
+	
+	<resultMap id="salesplan" type="itemviewVO">
+		<result property="plancode" column="plan_code" />
+		<result property="item_code" column="item_code" />
+        <result property="item_name" column="item_name" />
+        <result property="standard" column="standard" />
+        <result property="inventory_unit" column="inventory_unit" />
+        <result property="planquantity" column="plan_item_quantity" />
+        <result property="planprice" column="plan_unit_price" />
+        <result property="newquantity" column="newplan_item_quantity" />
+        <result property="newprice" column="newplan_unit_price" />
+        <result property="plandate" column="plan_date" />
+	</resultMap> 
+
+	<select id="selectAllItemList" resultMap="salesplan">
+      <![CDATA[select * from SM_BIM_Ite_Reg order by item_code]]>
+	</select>
+
+	<!-- 외주발주등록 파트 -->
+<resultMap id="outsourcingView" type="RegOutsourcingVO">
+		<result property="workOrderNumber" column="workOrderNumber" />
+		<result property="instructionDate" column="instructionDate" />
+		<result property="dueDate" column="dueDate" />
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+		<result property="indicatedQuantity" column="indicatedQuantity" />
+		<result property="unitPrice" column="unitPrice" />				
+		<result property="status" column="status" />
+		<result property="inspection" column="inspection" />
+		<result property="note" column="note" />		
+		<result property="productionPlanCode" column="ProductionPlanCode" />
+		
+	</resultMap>
+	
+	<select id="selectAllOutsourcingList" resultMap="outsourcingView">
+		<![CDATA[select workOrderNumber,instructionDate,dueDate,Item_Code,Item_Name,Standard,Inventory_Unit,indicatedQuantity,unitPrice,indicatedQuantity*unitPrice,status,inspection,note,ProductionPlanCode  from CPM_OM_Out_Per_Reg]]>
+	</select>
+	
+	
+	<delete id="deleteOutsourcing">
+		<![CDATA[delete from CPM_OM_Out_Per_Reg where workOrderNumber=#{workOrderNumber}]]>
+	</delete>
+
+	<insert id="insertOutsourcing" parameterType="RegOutsourcingVO">
+		<![CDATA[
+		 insert into CPM_OM_Out_Per_Reg
+		 values(F_GET_NEXT_SEQ('CPM_PM_Ope_Per_Reg'),'출고대기','P101',#{instructionDate}, #{dueDate}, #{itemCode}, #{itemName}, #{standard}, #{inventoryUnit}, #{indicatedQuantity}, #{unitPrice},'계획', '비검사', #{note},F_GET_NEXT_SEQ('CPM_PM_Pro_Pla_Reg'))
+		]]>  
+	</insert>
+	
+	<update id="updateOutsourcing" parameterType="RegOutsourcingVO">
+		<![CDATA[
+		update CPM_OM_Out_Per_Reg
+		set dueDate=#{dueDate},indicatedQuantity=#{indicatedQuantity}, unitPrice=#{unitPrice}, note=#{note}
+		where  workOrderNumber=#{workOrderNumber}
+		]]>  
+	</update>
+
+
+	<!-- 외주발주확정 파트 -->
+	<resultMap id="comOutsourcingView" type="ComOutsourcingVO">
+		<result property="workOrderNumber" column="workOrderNumber" />
+		<result property="materialForwardingStatus" column="materialForwardingStatus" />
+		<result property="instructionDate" column="instructionDate" />
+		<result property="dueDate" column="dueDate" />
+		<result property="parentItemCode" column="Item_Code" />
+		<result property="parentItemName" column="Item_Name" />
+		<result property="parentStandard" column="Standard" />
+		<result property="parentInventoryUnit" column="Inventory_Unit" />
+		<result property="unitPrice" column="unitPrice" />				
+		<result property="status" column="status" />
+		<result property="inspection" column="inspection" />
+		<result property="parentNote" column="note" />		
+	</resultMap>
+
+		<update id="updateComOutsourcing" parameterType="ComOutsourcingVO">
+		<![CDATA[
+		update CPM_OM_Out_Per_Reg
+		set status = '확정'
+		where  workOrderNumber=#{workOrderNumber}
+		]]>  
+	</update>
+	
+	<select id="selectAllComOutsourcingList" resultMap="comOutsourcingView">
+		<![CDATA[select workOrderNumber,materialForwardingStatus,instructionDate,dueDate,Item_Code,Item_Name,Standard,Inventory_Unit,indicatedQuantity,unitPrice,indicatedQuantity*unitPrice,status,inspection,note  from CPM_OM_Out_Per_Reg]]>
+	</select>
+	
+	<!-- 외주발주확정 세부사항 파트 -->
+	<resultMap id="comOutsourcingViewDetail" type="ComOutsourcingVO">
+		<result property="no" column="no" />
+		<result property="billingDate" column="billingDate" />
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+		<result property="precisionQuantity" column="precisionQuantity" />
+		<result property="loss" column="loss" />				
+		<result property="note" column="note" />
+		<collection property="bomView" column="itemCode" select="selectAllMemberList"></collection>
+	</resultMap>
+	
+	<select id="selectComOutsourcingListDetail" resultMap="comOutsourcingViewDetail">
+		<![CDATA[select DISTINCT(mat.workordernumber),OUT.Item_Code,OUT.billingDate,OUT.Item_Name,OUT.Standard,OUT.Inventory_Unit,OUT.precisionQuantity,OUT.loss,OUT.precisionQuantity+(OUT.precisionQuantity*OUT.loss*0.01) as 확정수량,bom.outsourcingunitprice as 외주단가,
+(OUT.precisionQuantity+(OUT.precisionQuantity*OUT.loss*0.01))*bom.outsourcingunitprice as 금액 ,OUT.note  
+from CPM_OM_Out_Mat_For_Det OUT,cpm_bim_bom_reg BOM,CPM_OM_Out_Per_Reg MAT
+where out.item_code=bom.item_code
+AND mat.workordernumber=out.workordernumber
+order by workordernumber]]>
+	</select>
+	
+	<!-- 외주자재출고 파트 -->
+	<resultMap id="outReleaseView" type="OutReleaseVO">
+		<result property="forwardingNumber" column="forwardingNumber" />
+		<result property="forwardingDate" column="forwardingDate" />
+		<result property="houseCode" column="func_hou_reg(House_Code)" />
+		<result property="locationCode" column="func_Wor_Reg(Location_Code)" />
+		<result property="outsourcingCode" column="func_Out_Reg(Outsourcing_Code)" />
+		<result property="workplaceCode" column="func_Out_Wor_Reg(Workplace_Code)" />
+		<result property="note" column="note" />	
+	</resultMap>
+
+	<select id="selectAllOutReleaseList" resultMap="outReleaseView">
+		<![CDATA[select forwardingNumber,forwardingDate,func_hou_reg(House_Code),func_Wor_Reg(Location_Code),func_Out_Reg(Outsourcing_Code),func_Out_Wor_Reg(Workplace_Code),note  from CPM_OM_Out_Mat_For]]>
+	</select>
+	
+	<insert id="insertOutRelease" parameterType="OutReleaseVO">
+		<![CDATA[
+		INSERT INTO CPM_OM_Out_Mat_For
+		VALUES (F_GET_NEXT_SEQ('PM_SM_Sto_Mov_Main'),#{forwardingDate}, #{houseCode}, #{locationCode}, #{outsourcingCode}, #{workplaceCode},#{note})
+		]]>  
+	</insert>
+
+	
+	<!-- 외주자재출고 세부사항 파트 -->
+	<resultMap id="outReleaseViewDetail" type="OutReleaseVO">
+		<result property="no" column="no" />
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+		<result property="precisionQuantity" column="precisionQuantity" />
+		<result property="forwardingQuantity" column="forwardingQuantity" />				
+		<result property="noteDetail" column="note" />
+		<result property="forwardingNumber" column="forwardingNumber" />
+		<result property="workOrderNumber" column="workOrderNumber" />
+		<collection property="comOutsourcingView" column="workOrderNumber" select="selectAllMemberList"></collection>
+	</resultMap>
+	
+	<select id="selectAllOutReleaseListDetail" resultMap="outReleaseViewDetail">
+		<![CDATA[SELECT NO,ITEM_CODE,ITEM_NAME,STANDARD,INVENTORY_UNIT,PRECISIONQUANTITY,FORWARDINGQUANTITY
+FROM CPM_OM_Out_Mat_For MAT, CPM_OM_Out_Mat_For_Det MAF
+WHERE MAT.FORWARDINGNUMBER = maf.forwardingnumber]]>
+	</select>
+	
+	<insert id="insertOutReleaseDetail" parameterType="OutReleaseVO">
+		<![CDATA[
+		INSERT INTO CPM_OM_Out_Mat_For_Det
+		VALUES (F_GET_NEXT_SEQ('NO'),#{billingDate}, #{itemCode}, #{itemName}, #{standard}, #{inventoryUnit},#{precisionQuantity},#{loss},#{forwardingQuantity},#{noteDetail},#{forwardingNumber},#{workOrderNumber})
+		]]>  
+	</insert>
+	
+		<!-- 외주실적등록 파트 -->
+	<resultMap id="regOutPerformanceView" type="RegOutPerformanceVO">
+		<result property="workOrderNumber" column="workOrderNumber" />
+		<result property="materialForwardingStatus" column="materialForwardingStatus" />
+		<result property="workplaceCode" column="workplaceCode" />
+		<result property="instructionDate" column="instructionDate" />
+		<result property="dueDate" column="dueDate" />
+		<result property="parentItemCode" column="Item_Code" />
+		<result property="parentItemName" column="Item_Name" />
+		<result property="parentStandard" column="Standard" />
+		<result property="parentInventoryUnit" column="Inventory_Unit" />
+		<result property="indicatedQuantity" column="indicatedQuantity" />
+		<result property="unitPrice" column="unitPrice" />							
+		<result property="status" column="status" />
+		<result property="parentInspection" column="inspection" />
+		<result property="parentNote" column="note" />		
+	</resultMap>
+	<!-- 회사등록(조회) 파트 -->
+	<resultMap id="comResult" type="SystemmagVO">
+		<result property="company_Code" column="Company_Code"	/>
+		<result property="company_Name" column="Company_Name"	/>
+		<result property="sortation" column="Sortation"	/>
+		<result property="fiscal_Year_Number" column="Fiscal_Year_Number"	/>
+		<result property="fiscal_Year_Dates" column="Fiscal_Year_Dates"	/>
+		<result property="fiscal_Year_Datee" column="Fiscal_Year_Datee"	/>
+		<result property="company_Registration_Number" column="Company_Registration_Number"	/>
+		<result property="corporate_Registration_Number" column="Corporate_Registration_Number"	/>
+		<result property="representatives_Name" column="Representatives_Name"	/>
+		<result property="resident_Registration_Number" column="Resident_Registration_Number"	/>
+		<result property="main_Store_Postal_Code" column="Main_Store_Postal_Code"	/>
+		<result property="main_Store_Address" column="Main_Store_Address"	/>
+		<result property="main_Branch_Number" column="Main_Branch_Number"	/>
+		<result property="main_Store_Tel" column="Main_Store_Tel"	/>
+		<result property="upstate" column="Upstate"	/>
+		<result property="industry" column="Industry"	/>
+		<result property="date_Of_Establishment" column="Date_Of_Establishment"	/>
+		<result property="whether_To_Use_Status" column="Whether_To_Use_Status"	/>
+	<!-- 조회 -->
+	</resultMap>
+	<select id="selectcomList" resultMap="comResult">
+		<![CDATA[select company_Code,company_Name,sortation from SM_CRI_Com_Reg]]>	
+	</select>
+	<select id="selectAllcomList" resultMap="comResult" parameterType="String">
+		<![CDATA[select * from SM_CRI_Com_Reg where company_code = #{company_Code}]]>	
+	</select>
+	<!-- 등록 -->
+	<insert id="insertCom" parameterType="systemmagVO">
+	<![CDATA[
+	insert into SM_CRI_Com_Reg
+	values(#{company_Code},#{company_Name}, #{sortation}, #{fiscal_Year_Number}, #{fiscal_Year_Dates}, #{fiscal_Year_Datee},
+	 #{company_Registration_Number},#{corporate_Registration_Number}, #{representatives_Name}, #{resident_Registration_Number}, #{main_Store_Postal_Code}, #{main_Store_Address},
+	 #{main_Branch_Number},#{main_Store_Tel}, #{upstate}, #{industry}, #{date_Of_Establishment}, #{whether_To_Use_Status})]]>
+	</insert>
+	<!-- 수정 -->
+	<update id="updatecompany" parameterType="SystemmagVO">
+		<![CDATA[
+			update SM_CRI_Com_Reg
+			set	company_Name=#{company_Name},
+			sortation=#{sortation},
+			fiscal_Year_Number=#{fiscal_Year_Number},
+			fiscal_Year_Dates=#{fiscal_Year_Dates},
+			fiscal_Year_Datee=#{fiscal_Year_Datee},
+			company_Registration_Number=#{company_Registration_Number},
+			corporate_Registration_Number=#{corporate_Registration_Number},
+			representatives_Name=#{representatives_Name},
+			resident_Registration_Number=#{resident_Registration_Number},
+			main_Store_Postal_Code=#{main_Store_Postal_Code},
+			main_Store_Address=#{main_Store_Address},
+			main_Branch_Number=#{main_Branch_Number},
+			main_Store_Tel=#{main_Store_Tel},
+			upstate=#{upstate},
+			industry=#{industry},
+			date_Of_Establishment=#{date_Of_Establishment},
+			whether_To_Use_Status=#{whether_To_Use_Status}
+			where company_Code=#{company_Code}
+		]]>
+	</update>
+	<!-- 삭제 -->
+	<delete id="deletecompany">
+		delete from SM_CRI_Com_Reg where Company_Code = #{no}
+	</delete>
+	<!-- 팝업 -->
+	<resultMap id="ZipViewResult" type="ZipcodeVO">
+		<result property="zipcode" column="Zipcode" />
+		<result property="road_address" column="Road_Address" />
+		<result property="lot_address" column="Lot_Address" />
+	</resultMap>
+	<select id="selectZipList" resultMap="ZipViewResult">
+		<![CDATA[select * from SM_CRI_Zip]]>
+	</select>
+	<select id="selectzip" resultMap="ZipViewResult"
+		parameterType="String">
+		<![CDATA[select zipcode,road_address,lot_address from SM_CRI_Zip where zipcode=#{zipNumber}]]>
+	</select>
+	<!-- 사업장등록 -->
+		<resultMap id="worResult" type="WorkplaceVO">
+		<result property="workplace_Code" column="Workplace_Code"	/>
+		<result property="workplace_Name" column="Workplace_Name"	/>
+		<result property="worcompany_Registration_Number" column="Company_Registration_Number"	/>
+		<result property="worcorporate_Registration_Number" column="Corporate_Registration_Number"	/>
+		<result property="worrepresentatives_Name" column="Representatives_Name"	/>
+		<result property="workplace_Zipcode" column="Workplace_Zipcode"	/>
+		<result property="workplace_Address" column="Workplace_Address"	/>
+		<result property="workplace_Number" column="Workplace_Number"	/>
+		<result property="workplace_Tel" column="Workplace_Tel"	/>
+		<result property="worupstate" column="Upstate"	/>
+		<result property="worindustry" column="industry"	/>
+		<result property="main_Store_Status" column="Main_Store_Status"	/>
+	</resultMap>
+	<!-- 조회 -->
+	<select id="selectworList" resultMap="worResult">
+		<![CDATA[select workplace_Code,workplace_Name from SM_CRI_Wor_Reg]]>	
+	</select>
+	<select id="selectAllworList" resultMap="worResult" parameterType="String">
+		<![CDATA[select * from SM_CRI_Wor_Reg where workplace_Code = #{workplace_Code}]]>	
+	</select>
+	<!-- 등록 -->
+	<insert id="insertWor" parameterType="workplaceVO">
+	<![CDATA[
+	insert into SM_CRI_Wor_Reg
+	values(#{workplace_Code},#{workplace_Name}, #{worcompany_Registration_Number}, #{worcorporate_Registration_Number}, #{worrepresentatives_Name}, #{workplace_Zipcode},
+	 #{workplace_Address},#{workplace_Number}, #{workplace_Tel}, #{worupstate}, #{worindustry}, #{main_Store_Status})]]>
+	</insert>
+	<!-- 수정 -->
+	<update id="updateworkplace" parameterType="workplaceVO">
+		<![CDATA[
+			update SM_CRI_Wor_Reg
+			set	workplace_Name=#{workplace_Name},
+			company_Registration_Number=#{worcompany_Registration_Number},
+			corporate_Registration_Number=#{worcorporate_Registration_Number},
+			representatives_Name=#{worrepresentatives_Name},
+			workplace_Zipcode=#{workplace_Zipcode},
+			workplace_Address=#{workplace_Address},
+			workplace_Number=#{workplace_Number},
+			workplace_Tel=#{workplace_Tel},
+			upstate=#{worupstate},
+			industry=#{worindustry},
+			main_Store_Status=#{main_Store_Status}
+			where workplace_Code=#{workplace_Code}
+		]]>
+	</update>
+	<!-- 삭제 -->
+	<delete id="deleteWor">
+		delete from SM_CRI_Wor_Reg where Workplace_Code = #{no}
+	</delete>
+	<!-- 품목등록 -->
+		<resultMap id="regitemResult" type="itemRegVO">
+		<result property="item_Code" column="Item_Code"/>
+		<result property="item_Name" column="Item_Name"/>
+		<result property="standard" column="Standard"/>
+		<result property="inventory_Unit" column="Inventory_Unit"/>
+		<result property="whether_LOT" column="Whether_LOT"/>
+		<result property="sET_Item" column="SET_Item"/>
+		<result property="inspection_Status" column="Inspection_Status"/>
+		<result property="use_Status" column="Use_Status"/>
+		<result property="lOT_Quantity" column="LOT_Quantity"/>
+		<result property="drawing_Number" column="Drawing_Number"/>
+		<result property="hs_Code" column="Hs_Code"/>
+		<result property="width" column="Width"/>
+		<result property="length" column="Length"/>
+		<result property="height" column="Height"/>
+		<result property="cost" column="Cost"/>
+		<result property="item_Group_Code" column="Item_Group_Code"/>
+		<result property="division" column="Division"/>
+		<result property="notes" column="Notes"/>
+		<result property="daily_production" column="Dailyproduction"/>
+		</resultMap>
+	<!-- 조회 -->
+		<select id="selectRegitemList" resultMap="regitemResult">
+		<![CDATA[select item_Code,item_Name,standard from SM_BIM_Ite_Reg]]>	
+	</select>
+	<select id="selectAllRegitemList" resultMap="regitemResult" parameterType="String">
+		<![CDATA[select * from SM_BIM_Ite_Reg where item_Code = #{item_Code}]]>	
+	</select>
+	<!-- 조건조회 -->
+	<select id="searchitemg" resultMap="regitemResult"
+		parameterType="String">
+		<![CDATA[select * from SM_BIM_Ite_Reg where item_Group_Code = #{itemNumber}]]>
+	</select>
+	<!-- 등록 -->
+	<insert id="insertItem" parameterType="itemVO">
+	<![CDATA[
+	insert into SM_BIM_Ite_Reg
+	values(#{item_Code},#{item_Name}, #{standard}, #{inventory_Unit}, #{whether_LOT}, #{sET_Item},
+	 #{inspection_Status}, #{use_Status}, #{lOT_Quantity}, #{drawing_Number}, #{hs_Code}, #{width}, #{length}
+	 , #{height}, #{cost}, #{item_Group_Code}, #{daily_production}, #{division}, #{notes} )]]>
+	</insert>
+	<insert id="insertPartItem" parameterType="itemVO">
+	<![CDATA[
+	INSERT INTO PM_SM_Pro_Stock(no,Item_Code,Item_Name,Standard,Inventory_Unit)
+VALUES (F_GET_NEXT_SEQ('PM_SM_Pro_Stock'),#{item_Code},#{item_Name}, #{standard},#{inventory_Unit})]]>
+	</insert>
+	<insert id="insertProductItem" parameterType="itemVO">
+	<![CDATA[
+	INSERT INTO PM_SM_Pro_FinishedProduct(no,Item_Code,Item_Name,Standard,Inventory_Unit)
+VALUES (F_GET_NEXT_SEQ('PM_SM_Pro_FProduct'),#{item_Code},#{item_Name}, #{standard},#{inventory_Unit})]]>
+	</insert>
+	<!-- 수정 -->
+	<update id="updateItem" parameterType="itemVO">
+		<![CDATA[
+			update SM_BIM_Ite_Reg
+			set	item_Name=#{item_Name},
+			standard=#{standard},
+			inventory_Unit=#{inventory_Unit},
+			whether_LOT=#{whether_LOT},
+			sET_Item=#{sET_Item},
+			inspection_Status=#{inspection_Status},
+			use_Status=#{use_Status},
+			lOT_Quantity=#{lOT_Quantity},
+			drawing_Number=#{drawing_Number},
+			hs_Code=#{hs_Code},
+			width=#{width},
+			length=#{length},
+			height=#{height},
+			cost=#{cost},
+			item_Group_Code=#{item_Group_Code},
+			division=#{division},
+			notes=#{notes},
+			DAILYPRODUCTION=#{daily_production}
+			where item_Code=#{item_Code}
+		]]>
+	</update>
+	<!-- 삭제 -->
+	<delete id="deleteItem">
+		delete from SM_BIM_Ite_Reg where Item_Code = #{no}
+	</delete>
+
+	<!-- 품목군등록 -->	
+		<resultMap id="itemgResult" type="ItemgVO">
+		<result property="item_Group_Code" column="Item_Group_Code"	/>
+		<result property="item_Group_Name" column="Item_Group_Name"	/>
+		<result property="use_Status" column="Use_Status"	/>
+		<result property="explanation" column="Explanation"	/>
+		<result property="div1" column="div"	/>
+		</resultMap>
+	<!-- 조회 -->
+	<select id="selectAllitemgList" resultMap="itemgResult">
+		<![CDATA[select DISTINCT gro.item_group_code,gro.item_group_name,1 as div
+from sm_bim_ite_gro_reg gro, sm_bim_ite_reg ite
+where gro.item_group_code = ite.item_group_code(+) and ite.item_name is null
+
+union
+
+select DISTINCT gro.item_group_code,gro.item_group_name,0
+from sm_bim_ite_gro_reg gro, sm_bim_ite_reg ite
+where gro.item_group_code = ite.item_group_code]]>	
+	</select>
+	<!-- 등록 -->
+	<insert id="insertItemg" parameterType="ItemgVO">
+	<![CDATA[
+	insert into SM_BIM_Ite_gro_Reg
+	values(#{item_Group_Code},#{item_Group_Name}, #{use_Status}, #{explanation})]]>
+	</insert>
+	<!-- 수정 -->
+	<update id="updateitemg" parameterType="ItemgVO">
+		<![CDATA[
+			update SM_BIM_Ite_gro_Reg
+			set	ITEM_GROUP_NAME=#{item_Group_Name},
+				USE_STATUS=#{use_Status},
+				EXPLANATION=#{explanation}
+			where ITEM_GROUP_CODE=#{item_Group_Code}
+		]]>
+	</update>
+	<!-- 삭제 -->
+	<delete id="deleteItemg">
+		delete from SM_BIM_Ite_gro_Reg where Item_Group_Code = #{no}
+	</delete>
+	<!-- 사원조회 -->
+	<resultMap id="employeeResult" type="EmployeeVO">
+		<result property="employee_Code" column="Employee_Code"	/>
+		<result property="employee_Name" column="Employee_Name"	/>
+		<result property="department_Code" column="Department_Code"	/>
+		<result property="department_Name" column="Department_Name"	/>
+		<result property="joinDate" column="JoinDate"	/>
+		<result property="resignationDate" column="ResignationDate"	/>
+		<result property="emergency_Contact_Network" column="Emergency_Contact_Network"	/>
+		</resultMap>
+	<select id="selectAllemployeeList" resultMap="employeeResult">
+		<![CDATA[select * from SM_CRI_Emp_Reg]]>	
+	</select>
+	
+	<!-- 부서등록 -->
+	<resultMap id="departmentResult" type="DepartmentVO">
+		<result property="department_Code" column="Department_Code"	/>
+		<result property="department_Name" column="Department_Name"	/>
+		<result property="workplace_Code" column="Workplace_Code"	/>
+		<result property="workplace_Name" column="Workplace_Name"	/>
+		<result property="sector_Code" column="Sector_Code"	/>
+		<result property="sector_Name" column="Sector_Name"	/>
+		<result property="usedate" column="Usedate"	/>
+		</resultMap>
+	<!-- 조회 -->
+	<select id="selectAlldepartmentList" resultMap="departmentResult">
+		<![CDATA[select * from SM_CRI_Dep_Reg]]>	
+	</select>
+	<!-- 등록 -->
+	<insert id="insertDep" parameterType="DepartmentVO">
+	<![CDATA[
+	insert into SM_CRI_Dep_Reg
+	values(#{department_Code},#{department_Name}, #{workplace_Code}, #{workplace_Name}, #{sector_Code}, #{sector_Name},
+	 #{usedate})]]>
+	</insert>
+	<!-- 수정 -->
+	<update id="updatedepartment" parameterType="DepartmentVO">
+		<![CDATA[
+			update SM_CRI_Dep_Reg
+			set	department_Name=#{department_Name},
+			workplace_Code=#{workplace_Code},
+			workplace_Name=#{workplace_Name},
+			sector_Code=#{sector_Code},
+			sector_Name=#{sector_Name},
+			usedate=#{usedate}
+			where department_Code=#{department_Code}
+		]]>
+	</update>
+	<!-- 삭제 -->
+	<delete id="deleteDep">
+		delete from SM_CRI_Dep_Reg where Department_Code = #{no}
+	</delete>
+	<!-- 부문 -->
+		<resultMap id="sectorResult" type="SectorVO">
+		<result property="sector_Code" column="Sector_Code"	/>
+		<result property="sector_Name" column="Sector_Name"	/>
+		<result property="useDate" column="UseDate"	/>
+		</resultMap>
+	<!-- 조회 -->
+	<select id="selectSector" resultMap="sectorResult">
+		<![CDATA[select * from SM_CRI_Sec_Reg]]>	
+	</select>
+	<!--기초정보관리파트-->
+	<!--기초정보관리_일반거래처등록-->
+	<resultMap id="basicInfoResult" type="SystemmagVOMJ">
+		<result property="general_Customer_Code" column="general_Customer_Code" />
+		<result property="general_Customer_Name" column="general_Customer_Name" />
+		<result property="general_Customer_Division" column="general_Customer_Division" />
+		<result property="company_Registration_Number" column="company_Registration_Number" />
+		<result property="resident_Registration_Number" column="resident_Registration_Number" />
+		<result property="representativs_Name" column="representativs_Name" />
+		<result property="upstate" column="upstate" />
+		<result property="industry" column="industry" />
+		<result property="zipCode" column="zipCode" />
+		<result property="workplace_Address" column="workplace_Address" />
+		<result property="generalCustomer_Tel" column="generalCustomer_Tel" />
+		<result property="wholesale_Retail_Business_Code" column="wholesale_Retail_Business_Code" />	
+		<result property="road_Address" column="road_Address" />
+		<result property="lot_Address" column="lot_Address" />
+	</resultMap>
+
+	<select id="selectAllRegOutPerformanceList" resultMap="regOutPerformanceView">
+		<![CDATA[select distinct(out.workordernumber),out.materialforwardingstatus,func_out_wor_reg(out.workplace_code),out.instructiondate,out.duedate,out.item_code,out.item_name,out.standard,out.inventory_unit,
+out.indicatedquantity,out.unitprice,(out.indicatedquantity*out.unitprice),sum(det.performancequantity),(out.indicatedquantity-sum(det.performancequantity)),out.status,out.inspection,out.note
+from CPM_OM_Out_Per_Reg out, CPM_OM_Out_Per_Reg_Det det
+where out.workordernumber= det.workordernumber
+group by out.workordernumber,out.materialforwardingstatus,func_out_wor_reg(out.workplace_code),out.instructiondate,out.duedate,out.item_code,out.item_name,out.standard,out.inventory_unit,
+out.indicatedquantity,out.unitprice,(out.indicatedquantity*out.unitprice),out.status,out.inspection,out.note
+ORDER BY out.workordernumber]]>
+	</select>
+	
+	<!-- 외주실적등록 세부사항 파트 -->
+	<resultMap id="regOutPerformanceViewDetail" type="RegOutPerformanceVO">
+		<result property="operationPerformanceNumber" column="operationPerformanceNumber" />
+		<result property="materialUseStatus" column="materialUseStatus" />
+		<result property="performanceDate" column="performanceDate" />
+		<result property="outsourcingCode" column="func_Out_Reg(Outsourcing_Code)" />
+		<result property="workplaceCode" column="func_Out_Wor_Reg(Workplace_Code)" />
+		<result property="sortation" column="sortation" />
+		<result property="performanceQuantity" column="performanceQuantity" />				
+		<result property="inspection" column="inspection" />
+		<result property="note" column="note" />
+		<result property="workOrderNumber" column="workOrderNumber" />
+	</resultMap>
+	
+	<select id="selectAllRegOutPerformanceDetail" resultMap="regOutPerformanceViewDetail">
+		<![CDATA[SELECT operationPerformanceNumber,materialUseStatus,performanceDate,func_Out_Reg(Outsourcing_Code),func_Out_Wor_Reg(Workplace_Code),
+		sortation,performanceQuantity,inspection,note
+		 FROM CPM_OM_Out_Per_Reg_Det]]>
+	</select>
+	<!-- 재고현황 파트 -->
+	<resultMap id="StoManage" type="StockManageVO">
+		<result property="moveNum" column="Move_Num" />
+		<result property="moveDate" column="Move_Date" />
+		<result property="outputBusiness" column="Output_Business" />
+		<result property="outputWarehouse" column="Output_Warehouse" />
+		<result property="outputPlace" column="Output_Place" />
+		<result property="inputBusiness" column="Input_Business" />
+		<result property="inputWarehouse" column="Input_Warehouse" />
+		<result property="inputPlace" column="Input_Place" />
+		<result property="note" column="Note" />	
+		<result property="no" column="NO" />	
+		<result property="itemCode" column="Item_Code" />	
+		<result property="itemName" column="Item_Name" />	
+		<result property="standard" column="Standard" />	
+		<result property="inventoryUnit" column="Inventory_Unit" />	
+		<result property="moveQuantity" column="Move_Quantity" />	
+		<result property="movePrice" column="Move_Price" />	
+		<result property="modNum" column="Mod_Num" />	
+		<result property="modDate" column="Mod_Date" />	
+		<result property="houseCode" column="House_Code" />	
+		<result property="locationCode" column="Location_Code" />	
+		<result property="generalCustomerCode" column="General_Customer_Code" />	
+		<result property="kind" column="Kind" />	
+		<result property="modQuantity" column="Mod_Quantity" />	
+		<result property="setCode" column="SET_Code" />	
+		<result property="inputQuantity" column="Input_Quantity" />	
+		<result property="outputQuantity" column="Output_Quantity" />	
+		<result property="purchasePrice" column="Purchase_Price" />	
+		<result property="salesPrice" column="Sales_Price" />	
+		<result property="quantity" column="Quantity" />	
+		<result property="type" column="Type" />	
+		<result property="typeCode" column="Type_Code" />	
+		<result property="typeName" column="Type_Name" />	
+		
+		<result property="busCode" column="Output_Business"/>
+			
+	</resultMap>
+	
+	<select id="stockView" parameterType="String"  resultMap="StoManage">
+		<![CDATA[ select no,Item_Code, Item_Name, Standard, Inventory_Unit, Quantity 
+		  from PM_SM_Pro_Stock
+		  where Item_Name = #{itemName}
+		]]>
+	</select>
+	
+	<select id="stockViewAll"  resultMap="StoManage">
+		<![CDATA[ select no,Item_Code, Item_Name, Standard, Inventory_Unit, Quantity 
+		  from PM_SM_Pro_Stock
+		]]>
+	</select>
+	
+	<select id="finishedstockView" parameterType="String"  resultMap="StoManage">
+		<![CDATA[ select no,Item_Code, Item_Name, Standard, Inventory_Unit, Quantity 
+		  from PM_SM_Pro_FinishedProduct
+		  where Item_Name = #{itemName}
+		]]>
+	</select>
+	
+	<select id="finishedstockViewAll" resultMap="StoManage">
+		<![CDATA[ select no,Item_Code, Item_Name, Standard, Inventory_Unit, Quantity 
+		  from PM_SM_Pro_FinishedProduct
+		]]>
+	</select>
+	
+	<select id="selectstockList" resultMap="StoManage">
+		<![CDATA[ select Item_Code, Item_Name, Standard, Inventory_Unit
+		  from PM_SM_Pro_Stock
+		]]>
+	</select>
+	
+	<select id="selectfinishedstockList" resultMap="StoManage">
+		<![CDATA[ select Item_Code, Item_Name, Standard, Inventory_Unit
+		  from PM_SM_Pro_FinishedProduct
+		]]>
+	</select>
+	
+	<select id="selectPopstockList" resultMap="StoManage">
+		<![CDATA[ select Item_Code, Item_Name, Standard, Inventory_Unit
+		  from PM_SM_Pro_Stock
+		  where Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	
+	<select id="selectPopstockList2" resultMap="StoManage">
+		<![CDATA[ select Item_Code, Item_Name, Standard, Inventory_Unit
+		  from PM_SM_Pro_FinishedProduct
+		  where Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	
+	
+	<!--  수주등록 파트 -->
+	<resultMap id="sujuView" type="StockManageVO">
+		<result property="ordersNum" column="ordersNum" />
+		<result property="ordersdate" column="ordersdate" />
+		<result property="general_Customer_Code" column="General_Customer_Code" />
+		<result property="general_Customer_Name" column="General_Customer_Name" />
+		<result property="tax" column="tax" />
+		<result property="note" column="Note" />
+		<result property="moveNum" column="Move_Num" />
+		<result property="moveDate" column="Move_Date" />
+		<result property="outputBusiness" column="Output_Business" />
+		<result property="outputWarehouse" column="Output_Warehouse" />
+		<result property="outputPlace" column="Output_Place" />
+		<result property="inputBusiness" column="Input_Business" />
+		<result property="inputWarehouse" column="Input_Warehouse" />
+		<result property="inputPlace" column="Input_Place" />
+		<result property="no" column="NO" />	
+		<result property="itemCode" column="Item_Code" />	
+		<result property="itemName" column="Item_Name" />	
+		<result property="standard" column="Standard" />	
+		<result property="inventoryUnit" column="Inventory_Unit" />	
+		<result property="moveQuantity" column="Move_Quantity" />	
+		<result property="movePrice" column="Move_Price" />	
+		<result property="modNum" column="Mod_Num" />	
+		<result property="modDate" column="Mod_Date" />	
+		<result property="houseCode" column="House_Code" />	
+		<result property="locationCode" column="Location_Code" />	
+		<result property="kind" column="Kind" />	
+		<result property="modQuantity" column="Mod_Quantity" />	
+		<result property="setCode" column="SET_Code" />	
+		<result property="inputQuantity" column="Input_Quantity" />	
+		<result property="outputQuantity" column="Output_Quantity" />	
+		<result property="purchasePrice" column="Purchase_Price" />	
+		<result property="salesPrice" column="Sales_Price" />	
+		<result property="quantity" column="Quantity" />	
+		<result property="type" column="Type" />	
+		<result property="typeCode" column="Type_Code" />	
+		<result property="typeName" column="Type_Name" />	
+		
+		<result property="busCode" column="Output_Business"/>
+	</resultMap>
+	<resultMap id="sujuView1" type="StockManageVO">
+		<result property="ordersNum" column="ordersNum"/>
+		<result property="ordersdate" column="ordersdate"/>
+		<result property="general_Customer_Code" column="General_Customer_Code"/>
+		<result property="tax" column="tax"/>
+		<result property="note" column="Note"/>
+	</resultMap>
+	
+
+	<select id="selectcusList" resultMap="sujuView">
+		<![CDATA[ select General_Customer_Code ,General_Customer_Name 
+		  from SM_BIM_Gen_Cus_Reg 
+		]]>
+	</select>
+	
+	<select id="selectItemList" resultMap="sujuView">
+		<![CDATA[ select Item_Code ,Item_Name  ,standard,Inventory_Unit
+		  from SM_BIM_Ite_Reg  
+		]]>
+	</select>
+	
+	<select id="selectPopCusList" resultMap="sujuView">
+		<![CDATA[ select General_Customer_Code, General_Customer_Name
+		  from SM_BIM_Gen_Cus_Reg
+		  where General_Customer_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	
+	<select id="selectPopItemList" resultMap="sujuView">
+		<![CDATA[ select Item_Code, Item_Name,standard,Inventory_Unit
+		  from SM_BIM_Ite_Reg
+		  where Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	
+	<select id="selectsujuList" resultMap="sujuView1">
+		<![CDATA[ select *
+		  from CSM_SM_Ord_Reg
+		  where General_Customer_Code = #{general_Customer_Code}
+		]]>
+	</select>
+	
+	<select id="selectsujusub" resultMap="sujuView">
+		<![CDATA[ select *
+		  from CSM_SM_COR_Reg
+		  where code  = #{ordersNum}
+		]]>
+	</select>
+	
+	<delete id="delsuju">
+		<![CDATA[  delete from CSM_SM_Ord_Reg where ordersNum = #{obj}
+		]]>
+	</delete>
+	
+	<delete id="delsujuSub">
+		<![CDATA[  delete from CSM_SM_COR_Reg where No = #{obj}
+		]]>
+	</delete>
+	
+	<insert id="insertSujuRow" parameterType="StockManageVO">
+		<![CDATA[
+		 insert into CSM_SM_Ord_Reg
+		 values(F_GET_NEXT_SEQ('CSM_SM_Ord_Reg'),#{ordersdate}, #{general_Customer_Code}, #{tax}, #{note})
+		]]>  
+	</insert>
+	
+	<insert id="insertSujuRowSub" parameterType="StockManageVO">
+		<![CDATA[
+		 insert into CSM_SM_COR_Reg
+		 values(F_GET_NEXT_SEQ('CSM_SM_Ord_Reg'),#{code}, #{itemCode}, #{itemName}, #{standard},#{inventoryUnit},#{dueDate},#{ordersQuantity},#{productPrice},#{vatPrice},#{expectedDate},#{inspection},'예외',#{busCode} )
+		]]>  
+	</insert>
+	
+	<update id="updateSujuRowSub" parameterType="StockManageVO">
+		<![CDATA[
+			update CSM_SM_COR_Reg
+			set	Item_Code = #{itemCode},
+			Item_Name = #{itemName},
+			standard = #{standard},
+			Inventory_Unit = #{inventoryUnit},
+			dueDate = #{dueDate},
+			ordersQuantity = #{ordersQuantity},
+			productPrice = #{productPrice},
+			vatPrice = #{vatPrice},
+			expectedDate = #{expectedDate},
+			inspection = #{inspection}
+			where No = #{no}			
+		]]>
+	</update>
+	
+	<update id="updateSujuRow" parameterType="StockManageVO">
+		<![CDATA[
+			update CSM_SM_Ord_Reg
+			set	ordersdate  =#{ordersdate},
+			General_Customer_Code  =#{general_Customer_Code},
+			tax =#{tax},
+			Note =#{note}
+			where ordersNum =#{ordersNum}			
+		]]>
+	</update>
+	
+	
+	<!-- 메뉴검색바  -->
+	<resultMap id="menuView" type="StockManageVO">
+		<result property="menu" column="menu" />
+		<result property="url" column="url" />
+	</resultMap>
+	
+	<select id="selectKeywordSearch" resultMap="menuView"  >
+	    <![CDATA[
+       	select menu
+		  from Menu
+		  where menu like '%'||#{keyword}||'%'
+		]]>
+	</select>
+	
+	<select id="searchMenu"  parameterType="String" resultType = "String"  >
+	    <![CDATA[
+       	select url
+		  from Menu
+		  where menu = #{searchWord}
+		]]>
+	</select>
+	<!-- 장순웅 검색 -->
+	<select id="selectPopitemList"  parameterType="String" resultMap="itemgResult">
+		<![CDATA[ select Item_Group_Code, Item_Group_Name
+		  from SM_BIM_Ite_gro_Reg
+		  where Item_Group_Name like '%'||#{item_Group_Name}||'%'
+		]]>
+	</select>
+	
+	<resultMap id="systemmagZipResult" type="SystemmagVOMJ">
+		<result property="zipCode" column="zipCode" />
+		<result property="road_Address" column="road_Address" />
+		<result property="lot_Address" column="lot_Address" />
+	</resultMap>
+	<select id="selectAllBasicList" resultMap="basicInfoResult">
+		<![CDATA[select * from SM_BIM_GEN_CUS_REG order by GENERAL_CUSTOMER_CODE]]>
+	</select>
+	<select id="selectSearchBasicList" parameterType="String" resultMap="basicInfoResult">
+		<![CDATA[select * from SM_BIM_GEN_CUS_REG where GENERAL_CUSTOMER_CODE = #{customerCode}]]>
+	</select>
+	<select id="selectBasicList" parameterType="String" resultMap="basicInfoResult">
+		<![CDATA[select * from SM_BIM_GEN_CUS_REG where GENERAL_CUSTOMER_CODE = #{com_code}]]>
+	</select>
+	<delete id="deleteBasicList" parameterType="String">
+		delete from SM_BIM_GEN_CUS_REG where GENERAL_CUSTOMER_CODE = #{no}
+	</delete>
+	<update id="updateBasicList" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			update SM_BIM_GEN_CUS_REG
+			set	general_Customer_Name=#{general_Customer_Name},
+			general_Customer_Division=#{general_Customer_Division},
+			company_Registration_Number=#{company_Registration_Number},
+			resident_Registration_Number=#{resident_Registration_Number},
+			representativs_Name=#{representativs_Name},
+			upstate=#{upstate},
+			industry=#{industry},
+			zipCode=#{zipCode},
+			workplace_Address=#{workplace_Address},
+			generalCustomer_Tel=#{generalCustomer_Tel},
+			wholesale_Retail_Business_Code=#{wholesale_Retail_Business_Code}
+			where general_Customer_Code=#{general_Customer_Code}			
+		]]>
+	</update>
+	<insert id="insertNewCustomer" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			insert into SM_BIM_GEN_CUS_REG
+			values(#{general_Customer_Code},
+			#{general_Customer_Name}, 
+			#{general_Customer_Division}, 
+			#{company_Registration_Number}, 
+			#{resident_Registration_Number}, 
+			#{representativs_Name},
+			#{upstate}, 
+			#{industry},
+			#{zipCode}, 
+			#{workplace_Address}, 
+			#{generalCustomer_Tel}, 
+			#{wholesale_Retail_Business_Code})]]>
+	</insert>
+	<select id="selectZipList1" parameterType="String" resultMap="basicInfoResult">
+		<![CDATA[select * from SM_CRI_ZIP]]>
+	</select>
+	<select id="selectPopCustomerList" resultMap="basicInfoResult">
+		<![CDATA[ select general_Customer_Code, general_Customer_Name
+		  from SM_BIM_GEN_CUS_REG
+		  where general_Customer_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	<select id="selectPopZipCodeList" resultMap="systemmagZipResult">
+		<![CDATA[ select zipCode, road_Address, lot_Address
+		  from SM_CRI_ZIP
+		  where road_Address like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	
+	<!-- 기초정보관리_창고/공정/외주공정등록 -->
+	<resultMap id="outwareInfoResult" type="SystemmagVOMJ">
+		<!-- 창고/장소파트 -->
+		<result property="house_Code" column="house_Code" />
+		<result property="house_Name" column="house_Name" />
+		<result property="house_Location_In" column="house_Location_In" />
+		<result property="house_Location_Out" column="house_Location_Out" />
+		<result property="house_Explanation" column="house_Explanation" />
+		<result property="house_Status" column="house_Status" />
+		<!-- 생산공정/작업장 -->
+		<result property="process_Code" column="process_Code" />
+		<result property="process_Name" column="process_Name" />
+		<result property="process_Location_In" column="process_Location_In" />
+		<result property="process_Location_Out" column="process_Location_Out" />
+		<result property="process_Explanation" column="process_Explanation" />
+		<result property="process_Status" column="process_Status" />
+		<!-- 외주공정/작업장 -->	
+		<result property="outsourcing_Code" column="outsourcing_Code" />
+		<result property="outsourcing_Name" column="outsourcing_Name" />
+		<result property="outsourcing_Location_In" column="outsourcing_Location_In" />
+		<result property="outsourcing_Location_Out" column="outsourcing_Location_Out" />
+		<result property="outsourcing_Explanation" column="outsourcing_Explanation" />
+		<result property="outsourcing_Status" column="outsourcing_Status" />
+	</resultMap>
+	<!-- 명제씨 창고 팝업 검색기능 -->
+	<select id="searchPopOutwareName" resultMap="outwareInfoResult">
+		<![CDATA[ select House_Code , House_Name 
+		  from SM_BIM_Hou_Reg 
+		  where House_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	
+	<!-- 윗칸 데이터 -->
+	<select id="selectAllHouOutware" resultMap="outwareInfoResult">
+		<![CDATA[select * from SM_BIM_HOU_REG]]>
+	</select>
+	<select id="selectAllProOutware" resultMap="outwareInfoResult">
+		<![CDATA[select * from SM_BIM_PRO_REG]]>
+	</select>
+	<select id="selectAllOutOutware" resultMap="outwareInfoResult">
+		<![CDATA[select * from SM_BIM_OUT_REG]]>
+	</select>
+	<!-- 윗칸조건검색 -->
+	<select id="selectOneHouOutware" parameterType="String" resultMap="outwareInfoResult">
+		<![CDATA[select * from SM_BIM_HOU_REG where house_Code = #{search}]]>
+	</select>
+	<select id="selectOneProOutware" parameterType="String" resultMap="outwareInfoResult">
+		<![CDATA[select * from SM_BIM_PRO_REG where process_Code = #{search}]]>
+	</select>
+	<select id="selectOneOutOutware" parameterType="String" resultMap="outwareInfoResult">
+		<![CDATA[select * from SM_BIM_OUT_REG where outsourcing_Code = #{search}]]>
+	</select>
+	<!-- 아랫칸 데이터 -->
+	<select id="selectAllHouWorOutware" resultMap="outwareInfoResult">
+		<![CDATA[select * from SM_BIM_WOR_REG]]>
+	</select>
+	<select id="selectAllProWorOutware" resultMap="outwareInfoResult">
+		<![CDATA[select * from SM_BIM_PRO_WOR_REG]]>
+	</select>
+	<select id="selectAllOutWorOutware" resultMap="outwareInfoResult">
+		<![CDATA[select * from SM_BIM_OUT_WOR_REG]]>
+	</select>
+	
+	<!-- 기초정보관리_물류관리내역등록 -->
+	<resultMap id="logisticsManagementResult" type="SystemmagVOMJ">	
+		<result property="logistics_In_Code" column="logistics_In_Code" />
+		<result property="logistics_In_Name" column="logistics_In_Name" />
+		<result property="explanation" column="explanation" />
+		<result property="remarks" column="remarks" />
+	</resultMap>
+	<select id="selectAllLogisticsManagement" resultMap="logisticsManagementResult">
+		<![CDATA[select * from SM_BIM_LOG_MAN]]>
+	</select>
+	<select id="selectOneLogisticsManagement" parameterType="String" resultMap="logisticsManagementResult">
+		<![CDATA[select * from SM_BIM_LOG_MAN where logistics_In_Code = #{com_code}]]>
+	</select>
+	<delete id="deleteLogisticsManagement">
+		delete from SM_BIM_LOG_MAN where logistics_In_Code = #{no}
+	</delete>
+	<update id="updateLogisticsManagement" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			update SM_BIM_LOG_MAN
+			set	logistics_In_Name=#{logistics_In_Name},
+			explanation=#{explanation},
+			remarks=#{remarks}
+			where logistics_In_Code=#{logistics_In_Code}			
+		]]>
+	</update>
+	<insert id="insertNewLogisticsManagement" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			insert into SM_BIM_LOG_MAN
+			values(#{logistics_In_Code},
+			#{logistics_In_Name}, 
+			#{explanation}, 
+			#{remarks})]]>
+	</insert>
+	<select id="selectPopLogisticsList" resultMap="logisticsManagementResult">
+		<![CDATA[ select logistics_In_Code, logistics_In_Name
+		  from SM_BIM_LOG_MAN
+		  where logistics_In_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	
+	<!-- 물류관리내역등록끝 -->
+	
+	<!-- 기초정보관리_검사유형등록 -->
+	<resultMap id="inspectionTypeResult" type="SystemmagVOMJ">	
+		<result property="inspection_Code" column="inspection_Code" />
+		<result property="inspection_Name" column="inspection_Name" />
+		<result property="inspection_Question" column="inspection_Question" />
+		<result property="remarks" column="remarks" />
+	</resultMap>
+	<select id="selectAllInspection" resultMap="inspectionTypeResult">
+		<![CDATA[select * from SM_BIM_INS_TYP]]>
+	</select>
+	<select id="selectOneInspection" parameterType="String" resultMap="inspectionTypeResult">
+		<![CDATA[select * from SM_BIM_INS_TYP where inspection_Code = #{com_code}]]>
+	</select>
+	<delete id="deleteInspection">
+		delete from SM_BIM_INS_TYP where inspection_Code = #{no}
+	</delete>
+	<update id="updateInspection" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			update SM_BIM_INS_TYP
+			set	inspection_Name=#{inspection_Name},
+			inspection_Question=#{inspection_Question},
+			remarks=#{remarks}
+			where inspection_Code=#{inspection_Code}			
+		]]>
+	</update>
+	<insert id="insertNewInspection" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			insert into SM_BIM_INS_TYP
+			values(#{inspection_Code},
+			#{inspection_Name}, 
+			#{inspection_Question}, 
+			#{remarks})]]>
+	</insert>
+	<!-- 검사유형등록등록끝 -->
+	
+	<!-- SET구성품등록 -->
+		<!-- 세트품 -->
+	<resultMap id="setRegResult" type="SystemmagVOMJ">	
+		<result property="set_Code" column="set_Code" />
+		<result property="set_Name" column="set_Name" />
+		<result property="set_Standard" column="set_Standard" />
+		<result property="set_Unit" column="set_Unit" />
+	</resultMap>
+	<select id="selectAllSetComponents" resultMap="setRegResult">
+		<![CDATA[select * from SM_BIM_SET_REG order by set_Code]]>
+	</select>
+	<select id="selectOneSetComponents" parameterType="String" resultMap="setRegResult">
+		<![CDATA[select * from SM_BIM_SET_REG where set_Code = #{com_code}]]>
+	</select>
+	<delete id="deleteSetComponents">
+		delete from SM_BIM_SET_REG where set_Code = #{no}
+	</delete>
+	<update id="updateSetComponents" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			update SM_BIM_SET_REG
+			set	set_Name=#{set_Name},
+			set_Standard=#{set_Standard},
+			set_Unit=#{set_Unit}
+			where set_Code=#{set_Code}			
+		]]>
+	</update>
+	<insert id="insertNewSetComponents" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			insert into SM_BIM_SET_REG
+			values(#{subSet_Code},
+			#{subSet_Name}, 
+			#{subSet_Standard}, 
+			#{subSet_Unit})]]>
+	</insert>
+	<select id="selectPopSetList" resultMap="setRegResult">
+		<![CDATA[ select set_Code, set_Name
+		  from SM_BIM_SET_REG
+		  where set_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+		<!-- 세트구성품 -->
+	<resultMap id="comRegResult" type="SystemmagVOMJ">	
+		<result property="set_Code" column="set_Code" />
+		<result property="components_Code" column="components_Code" />
+		<result property="components_Name" column="components_Name" />
+		<result property="components_Standard" column="components_Standard" />
+		<result property="components_Unit" column="components_Unit" />
+		<result property="components_Stock" column="components_Stock" />
+	</resultMap>
+	<select id="selectAllSpecComponents" resultMap="comRegResult">
+		<![CDATA[select * from SM_BIM_COM_REG]]>
+	</select>
+	<select id="selectOneSpecComponents" parameterType="String" resultMap="comRegResult">
+		<![CDATA[select * from SM_BIM_COM_REG where set_Code = #{com_code}]]>
+	</select>
+	<select id="selectPopSpecList" resultMap="setRegResult">
+		<![CDATA[ select components_Code, components_Name
+		  from SM_BIM_COM_REG
+		  where components_Name like '%'||#{itemName}||'%' order by set_Code
+		]]>
+	</select>
+	<delete id="deleteSpecComponents">
+		delete from SM_BIM_COM_REG where components_Code = #{no}
+	</delete>
+	<update id="updateSpecComponents" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			update SM_BIM_COM_REG
+			set	components_Name=#{components_Name},
+			components_Standard=#{components_Standard},
+			components_Unit=#{components_Unit},
+			components_Stock=#{components_Stock}
+			where components_Code=#{components_Code}			
+		]]>
+	</update>
+	<insert id="insertNewSpecComponents" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			insert into SM_BIM_COM_REG
+			values(#{set_Code},
+			#{components_Code},
+			#{components_Name}, 
+			#{components_Standard}, 
+			#{components_Unit},
+			#{components_Stock})]]>
+	</insert>
+	<insert id="insertNewSubSpecComponents" parameterType="SystemmagVOMJ">
+		<![CDATA[
+			insert into SM_BIM_COM_REG
+			values(#{set_Code},
+			#{subComponents_Code},
+			#{subComponents_Name}, 
+			#{subComponents_Standard}, 
+			#{subComponents_Unit},
+			#{subComponents_Stock})]]>
+	</insert>
+	<select id="selectPopComponentsList" resultMap="comRegResult">
+		<![CDATA[ select components_Code, components_Name
+		  from SM_BIM_COM_REG
+		  where components_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	<select id="searchPopCompoItemNameAjax" resultMap="comRegResult" parameterType="String">
+		<![CDATA[ select *
+		  from SM_BIM_Ite_Reg
+		  where Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	<!-- SET구성품등록끝 -->
+	
+	<!-- popCust--> 
+	<select id="allCustList" resultMap="basicInfoResult">
+		<![CDATA[select * from SM_BIM_Gen_Cus_Reg order by General_Customer_Code]]>
+	</select><!--  -->
+	<select id="selectAllSalesplanList" resultMap="salesplan">
+      <![CDATA[select * from SM_BIM_Sal_Pla_Reg order by plan_code]]>
+	</select>
+	
+     <select id="submititemview" resultMap="salesplan" parameterType="String">
+		<![CDATA[select * from SM_BIM_Sal_Pla_Reg where item_code = #{item_code} order by plan_code]]>   
+	</select>  
+			<!-- order&cor sta -->
+	<resultMap id="orderJoinList" type="orderVO">
+			<id property="ordCode" column="ordersNum" />
+        	<result property="ordDate" column="ordersdate" />
+        	<result property="tax" column="tax" />
+        	<result property="note" column="note" />
+        	<result property="custCode" column="General_Customer_Code" />
+       		 <result property="custName" column="General_Customer_Name" />
+        	<result property="comNum" column="Company_Registration_Number" />
+        	<result property="repName" column="Representativs_Name" />	
+        <collection property="corVO" javaType="CorVO">
+        	<result property="ordCode" column="code" />
+        	<result property="custCode" column="General_Customer_Code" />
+        	<result property="item_code" column="item_code" />
+        	<result property="item_name" column="item_name" />        
+        	<result property="stand" column="standard" />
+        	<result property="unit" column="inventory_unit" />
+        	<result property="dueDate" column="dueDate" />
+        	<result property="orderQuant" column="ordersQuantity" />
+        	<result property="price" column="productPrice" />
+        	<result property="expDate" column="expectedDate" />
+        	<result property="inspection" column="inspection" />
+        	<result property="orderOX" column="orderOX" />
+        </collection>
+	</resultMap> 
+
+	
+	<select id="allCustForStaOrder" resultMap="orderJoinList">
+      <![CDATA[select * from SM_BIM_Gen_Cus_Reg]]>
+	</select><!-- popCust  allCustForStaOrder-->
+	
+		<select id="submitStaOrdCust" resultMap="orderJoinList" parameterType="String">
+      <![CDATA[
+      select * from CSM_SM_Ord_Reg ORD, CSM_SM_COR_Reg COR
+       where ORD.ordersNum = COR.code
+       and ORD.General_Customer_Code = #{custCode}
+       order by COR.General_Customer_Code
+        ]]>
+	</select>
+	
+	<select id="StaOrderList" resultMap="orderJoinList">
+      <![CDATA[
+        select * from CSM_SM_Ord_Reg ORD, CSM_SM_COR_Reg COR
+		 where ORD.ordersNum = COR.code order by ORD.ordersNum
+        ]]>
+	</select>	
+	
+<!-- forwarding registration -->
+  	<resultMap id="forward" type="forwardVO">
+		<result property="relCode" column="releaseNum" />
+		<result property="relDate" column="releaseDate" />
+		<result property="deadLine" column="deadLine" />
+		<result property="releaseOX" column="releaseOX" />
+		<result property="note" column="note" />
+		<result property="general_Customer_Code" column="General_Customer_Code" />
+		<result property="general_Customer_Name" column="General_Customer_Name" />
+		<result property="company_Registration_Number" column="company_Registration_Number" />
+	</resultMap> 
+
+	<select id="submitSupForward" resultMap="forward" parameterType="forwardVO">
+		<![CDATA[select * from CSM_SM_Rel_Pro where General_Customer_Code=#{General_Customer_Code}]]>
+	</select>	
+	<select id="submitCustForward" resultMap="forward" parameterType="String">
+		<![CDATA[select General_Customer_Code from SM_BIM_Gen_Cus_Reg where General_Customer_Code=#{general_Customer_Code}]]>
+	</select>
+	<delete id="delSupforward" parameterType="String">
+		<![CDATA[delete from CSM_SM_Rel_Pro where releaseNum=#{relCode}]]>      
+  </delete>
+
+	<select id="allSupForward" resultMap="forward">
+		<![CDATA[select * from SM_BIM_Gen_Cus_Reg GEN, CSM_SM_Rel_Pro REL]]>
+	</select>
+	<insert id="insertSupForward" parameterType="forwardVO">
+		<![CDATA[
+		insert into CSM_SM_Rel_Pro
+		values (F_GET_NEXT_SEQ('CSM_SM_Rel_Pro'), #{relDate}, #{general_Customer_Code},#{releaseOX}, #{deadLine}, #{note})
+		]]>  
+	</insert>
+
+	
+	  	<resultMap id="Corforward" type="forwardVO">
+		<result property="relCode" column="releaseNum" />
+		<result property="general_Customer_Code" column="General_Customer_Code" />
+		<collection property="corVO" resultMap="Corfor">
+ 
+        </collection>
+</resultMap>  
+ 
+	<select id="submitSubForward" resultMap="Corforward">
+		<![CDATA[select * from CSM_SM_Rel_Pro REL, CSM_SM_COR_Reg COR
+		 where REL.releaseNum = COR.code	
+		 and REL.releaseNum =#{relCode}]]>
+	</select>
+	<select id="submitItemForward" parameterType="String" resultMap="Corfor">
+		<![CDATA[select * from CSM_SM_Rel_Pro REL, CSM_SM_COR_Reg COR
+		 where REL.releaseNum = COR.code and COR.code =#{relCode}
+		 ]]>
+	</select>
+	
+
+
+<resultMap id="Corfor" type="corVO">
+		<id property="no" column="no" />	
+		<result property="relCode" column="code" />
+		<result property="general_Customer_Code" column="General_Customer_Code" />
+        <result property="item_code" column="item_code" />
+        <result property="item_name" column="item_name" />        
+        <result property="stand" column="standard" />
+        <result property="unit" column="inventory_unit" />
+        <result property="dueDate" column="dueDate" />
+        <result property="orderQuant" column="ordersQuantity" />
+        <result property="price" column="productPrice" />
+        <result property="expDate" column="expectedDate" />
+        <result property="inspection" column="inspection" />
+        <result property="orderOX" column="orderOX" />
+        <result property="quantity" column="quantity" />
+        	
+</resultMap> 
+	<select id="allItemForward" resultMap="Corfor">
+		<![CDATA[select * from CSM_SM_Rel_Pro REL, CSM_SM_COR_Reg COR
+		 where REL.releaseNum = COR.code order by code]]>
+	</select>	
+
+	<insert id="insertForwardItem" parameterType="corVO">
+		<![CDATA[
+		insert into CSM_SM_COR_Reg
+		values (#{no},#{relCode},#{item_code},#{item_name}, #{stand}, #{unit},#{dueDate},#{orderQuant},#{price},#{vatprice},#{expDate},#{inspection},#{orderOX},#{general_Customer_Code})
+		]]>  
+	</insert>
+
+	<delete id="delItemforward" parameterType="String">
+		<![CDATA[delete from CSM_SM_COR_Reg where no=#{no}]]>      
+  </delete>
+	
+	<select id="stockQuantity" resultMap="Corfor">
+		<![CDATA[select * from PM_SM_Pro_Stock where item_code = #{item_code}]]>
+	</select>	
+		<update id="updForwardQuantity" parameterType="corVO">
+		<![CDATA[update PM_SM_Pro_finishedproduct
+		 		 set quantity = quantity - #{orderQuant}
+		 		 where item_code = #{item_code}]]>
+	</update>
+	
+	
+		<update id="updateSubForward" parameterType="corVO">
+		<![CDATA[update CSM_SM_COR_Reg
+		set inspection = #{inspection}, orderOX=#{orderOX}
+		where item_code = #{item_code}]]>
+	</update>
+		<update id="updateForward" parameterType="forwardVO">
+		<![CDATA[update CSM_SM_Rel_Pro
+		set deadLine = #{deadLine}, note = #{note} 
+		where releaseNum = #{relCode}]]>
+	</update>
+	<!-- 출고현황(재원) -->
+	<resultMap id="rsjView" type="rsjVO">
+		<result property="releaseNum" column="releaseNum" />
+		<result property="releaseDate" column="releaseDate" />
+		<result property="customerCode" column="General_Customer_Code" />
+	</resultMap>
+	<resultMap id="rsView" type="rsVO">
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="dueDate" column="dueDate" />
+		<result property="productPrice" column="productPrice" />
+		<result property="vatPrice" column="vatPrice" />
+		<result property="ordersQuantity" column="ordersQuantity" />
+		<result property="orderOX" column="orderOX" />
+		<collection property="rsjVO" resultMap="rsjView"></collection>
+	</resultMap>
+	<select id="rsSelectAllMemberList" resultMap="rsView">
+		<![CDATA[select pro.releaseNum, pro.releaseDate, pro.General_Customer_Code, reg.Item_Code, reg.Item_Name, reg.dueDate, reg.ordersQuantity, reg.productPrice, reg.vatPrice, reg.orderOX 
+				from CSM_SM_Rel_Pro pro, CSM_SM_COR_Reg reg 
+				where pro.General_Customer_Code = reg.General_Customer_Code
+				]]>
+	</select>
+	<select id="rsSearchItem" resultMap="rsView" parameterType="java.util.HashMap">
+		<![CDATA[select pro.releaseNum, pro.releaseDate, pro.General_Customer_Code, reg.Item_Code, reg.Item_Name, reg.dueDate, reg.ordersQuantity, reg.productPrice, reg.vatPrice, reg.orderOX 
+				from CSM_SM_Rel_Pro pro, CSM_SM_COR_Reg reg
+				where pro.General_Customer_Code = reg.General_Customer_Code and pro.releaseDate between #{startDate} and #{endDate}
+		]]>
+	</select>
+	
+	<!-- 판매계획등록(재원) -->
+	<resultMap id="spView" type="spVO">
+		<result property="planDate" column="Plan_Date" />
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+		<result property="planItemQuantity" column="Plan_Item_Quantity" />
+		<result property="planUnitPrice" column="Plan_Unit_Price" />
+		<result property="newPlanItemQuantity" column="Newplan_Item_Quantity" />
+		<result property="newPlanUnitPrice" column="Newplan_Unit_Price" />
+	</resultMap>
+	<resultMap id="spView1" type="spVO">
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+	</resultMap>
+	<resultMap id="spPopView" type="spVO">
+		<result property="itemCode" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+	</resultMap>
+
+	<select id="spSelectAllMemberList" resultMap="spView">
+		<![CDATA[select * from SM_BIM_Sal_Pla_Reg]]>
+	</select>
+	<select id="spSearchItem" resultMap="spView" parameterType="String">
+		<![CDATA[select * from SM_BIM_Sal_Pla_Reg where Item_Code = #{itemCode}]]>
+	</select>
+	<select id="spSelectItem1" resultMap="spView1" parameterType="String">
+		<![CDATA[select Item_Code, Item_Name, Standard, Inventory_Unit from SM_BIM_Ite_Reg where Item_Code = #{itemCode}]]>
+	</select>
+	<select id="spSelectPopList1" resultMap="spPopView">
+		<![CDATA[select * from SM_BIM_Sal_Pla_Reg]]>
+	</select>
+	<select id="spSelectPopList2" resultMap="spPopView">
+		<![CDATA[select * from SM_BIM_Ite_Reg]]>
+	</select>
+	<select id="spChildView" resultMap="spView1" parameterType="java.util.HashMap">
+		<![CDATA[select * from SM_BIM_Ite_Reg where Item_Code = #{itemCode}]]>
+	</select>
+	<insert id="insertSp" parameterType="spVO">
+		<![CDATA[
+		insert into SM_BIM_Sal_Pla_Reg (Plan_Code, Plan_Date, Item_Code, Item_Name, Standard, Inventory_Unit, Plan_Item_Quantity, Plan_Unit_Price, Newplan_Item_Quantity, Newplan_Unit_Price) 
+		values (F_GET_NEXT_SEQ('SM_BIM_Sal_Pla_Reg'), #{planDate}, #{itemCode}, #{itemName}, #{standard}, #{inventoryUnit}, #{planItemQuantity}, #{planUnitPrice}, #{newPlanItemQuantity}, #{newPlanUnitPrice})
+		]]>  
+	</insert>
+	<delete id="deleteSp">
+		delete from SM_BIM_Sal_Pla_Reg where Item_Code = #{itemCode}
+	</delete>
+	<update id="updateSp" parameterType="spVO">
+		<![CDATA[
+		update SM_BIM_Sal_Pla_Reg
+		set Newplan_Item_Quantity = #{newPlanItemQuantity}, Newplan_Unit_Price = #{newPlanUnitPrice}
+		where Item_Code = #{itemCode}
+		]]>
+	</update>
+	<!-- 품목단가등록 팝 검색기능 -->
+	<select id="selectPopspList"  parameterType="String" resultMap="spPopView">
+		<![CDATA[ select Item_Code, Item_Name,Standard
+		  from SM_BIM_Sal_Pla_Reg
+		  where Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	<select id="selectPopspList2"  parameterType="String" resultMap="spPopView">
+		<![CDATA[ select Item_Code, Item_Name
+		  from SM_BIM_Ite_Reg 
+		  where Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	<!-- 품목단가등록(재원) 파트 -->
+
+	<resultMap id="iupView" type="iupVO">
+		<result property="no" column="No" />
+		<result property="itemNumber" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+		<result property="purchasePrice" column="Purchase_Price" />
+		<result property="salesPrice" column="Sales_Price" />
+	</resultMap>
+	<resultMap id="iupView1" type="iupVO">
+		<result property="itemNumber" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+		<result property="inventoryUnit" column="Inventory_Unit" />
+	</resultMap>
+	<resultMap id="iupPopView" type="iupVO">
+		<result property="itemNumber" column="Item_Code" />
+		<result property="itemName" column="Item_Name" />
+		<result property="standard" column="Standard" />
+	</resultMap>
+
+	<select id="iupSelectAllMemberList" resultMap="iupView">
+		<![CDATA[select * from PM_SM_Ite_Pri]]>
+	</select>
+	<select id="iupSelectNo" resultType="int">
+		<![CDATA[select MAX(no) from PM_SM_Ite_Pri]]>
+	</select>
+	<select id="iupSearchItem" resultMap="iupView" parameterType="String">
+		<![CDATA[select * from PM_SM_Ite_Pri where Item_Code = #{itemNumber}]]>
+	</select>
+	<select id="iupSelectItem1" resultMap="iupView1" parameterType="String">
+		<![CDATA[select Item_Code, Item_Name, Standard, Inventory_Unit from SM_BIM_Ite_Reg where Item_Code = #{itemNumber}]]>
+	</select>
+	<select id="iupSelectPopList1" resultMap="iupPopView">
+		<![CDATA[select * from PM_SM_Ite_Pri]]>
+	</select>
+	<select id="iupSelectPopList2" resultMap="iupPopView">
+		<![CDATA[select * from SM_BIM_Ite_Reg]]>
+	</select>
+	<select id="iupChildView" resultMap="iupView1" parameterType="java.util.HashMap">
+		<![CDATA[select * from SM_BIM_Ite_Reg where Item_Code = #{itemNumber}]]>
+	</select>
+	<insert id="insertIup" parameterType="iupVO">
+		<![CDATA[
+		 insert into PM_SM_Ite_Pri(No, Item_Code, Item_Name, Standard, Inventory_Unit, Purchase_Price, Sales_Price)
+		 values(#{no}, #{itemNumber}, #{itemName}, #{standard}, #{inventoryUnit}, #{purchasePrice}, #{salesPrice})
+		]]>  
+	</insert>
+
+	<delete id="deleteIup">
+		delete from PM_SM_Ite_Pri where No = #{no}
+	</delete>
+	<update id="updateIup" parameterType="iupVO">
+		<![CDATA[
+		update PM_SM_Ite_Pri
+		set Purchase_Price = #{purchasePrice}, Sales_Price = #{salesPrice}
+		where No = #{no}
+		]]>
+	</update>
+	<!-- 품목단가등록 팝 검색기능 -->
+	<select id="selectPopiupList"  parameterType="String" resultMap="iupPopView">
+		<![CDATA[ select Item_Code, Item_Name,Standard
+		  from PM_SM_Ite_Pri
+		  where Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	<select id="selectPopiupList2"  parameterType="String" resultMap="iupPopView">
+		<![CDATA[ select Item_Code, Item_Name
+		  from SM_BIM_Ite_Reg 
+		  where Item_Name like '%'||#{itemName}||'%'
+		]]>
+	</select>
+	<!-- 로그인 기능 -->
+	 <resultMap id="LoginView" type="loginVO">
+		<result property="dep_Code" column="DEPARTMENT_CODE" />
+		<result property="dep_Name" column="DEPARTMENT_NAME" />
+		<result property="emp_Code" column="EMPLOYEE_CODE" />
+		<result property="emp_Name" column="EMPLOYEE_NAME" />
+		<result property="password" column="EMPLOYEE_PASSWORD" />
+	</resultMap>
+	<select id="selectDep"  resultMap="LoginView">
+		<![CDATA[select DEPARTMENT_CODE, DEPARTMENT_NAME from sm_cri_dep_reg
+		]]>
+	</select>
+	<select id="selectEmp"  resultMap="LoginView" parameterType="String">
+		<![CDATA[select EMPLOYEE_CODE, EMPLOYEE_NAME from sm_cri_emp_reg where DEPARTMENT_CODE = #{depCode}
+		]]>
+	</select>
+	<select id="LoginCheck"  resultMap="LoginView">
+		<![CDATA[select EMPLOYEE_CODE,EMPLOYEE_NAME,DEPARTMENT_CODE, DEPARTMENT_NAME from sm_cri_emp_reg where EMPLOYEE_CODE = #{emp_Code} and DEPARTMENT_CODE=#{dep_Code} and EMPLOYEE_PASSWORD=#{password}
+		]]>
+	</select>
+</mapper>
